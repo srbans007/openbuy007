@@ -4,6 +4,7 @@
 
 export const environment = {
     production: false,
+    //endpoint: 'https://openbuytc.com/'
     endpoint: 'http://localhost:3001/'
   };
   

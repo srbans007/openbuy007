@@ -1,0 +1,31 @@
+<div class="grid-col-1">
+    <div class="grid-item">
+        <h1 style="padding-left: 10px; margin: 0 !important">CARGA A TIENDAS</h1>
+        <h5 style="padding-left: 10px; margin: 5px !important">(CARGA DE ARCHIVO .XLSX)</h5>
+        <mat-card>
+            <mat-card-content>
+              <div class="button-container">
+                <input type="file" class="file-input"
+                   accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                   (change)="onFileSelected($event)" #fileUpload>
+
+                <div class="file-upload">
+                    {{fileName || "Seleccionar Archivo."}}
+                    <button (click)="fileUpload.click(); fileUpload.value = ''" mat-stroked-button color="primary" cdkFocusInitial>
+                        Examinar<mat-icon>attach_file</mat-icon>
+                    </button>
+                    <span style="padding: 5px"></span>
+                    <button (click)="onUpload()" mat-stroked-button color="primary" [disabled]="!fileName">
+                        Cargar<mat-icon>cloud_upload</mat-icon>
+                    </button>
+                </div>
+              </div>
+
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+
+</div>
+
+

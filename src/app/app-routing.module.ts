@@ -10,11 +10,11 @@ import { SignInComponent } from './components/sign-in/sign-in.component';
 import { AuthGuard } from './utils/auth.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  //{ path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', loadChildren: () => import('./components/dashboard/dashboard.module').then(x => x.DashboardModule)},
   { path: 'login', component: LoginComponent },
   { path: 'signIn', component: SignInComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: 'login', pathMatch: 'full' }
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({

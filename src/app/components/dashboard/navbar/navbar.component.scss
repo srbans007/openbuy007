@@ -1,0 +1,26 @@
+.navbar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .navbar {
+    flex: 0 0 auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  :host ::ng-deep .mat-toolbar {
+    min-height: 40px;
+  }
+  
+  :host ::ng-deep .mat-toolbar-row {
+    height: 40px;
+  }
+  
+  .spacer {
+    flex: 1 1 auto;
+  }
+  

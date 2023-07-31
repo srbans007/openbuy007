@@ -1,0 +1,8 @@
+.button-container {
+    display: flex;
+    align-items: center;
+  
+    button {
+      margin-left: 10px; // Esto separa el botón del campo de entrada
+    }
+  }

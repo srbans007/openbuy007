@@ -1,0 +1,29 @@
+  <div class="navbar-container">
+    <mat-toolbar color="primary" class="navbar">
+        <!-- Add your navbar content here -->
+        <mat-toolbar-row>
+            <button mat-icon-button (click)="toggleSidenav()">
+                <mat-icon>menu</mat-icon>
+            </button>
+            <span>OPENBUY</span>
+
+            <span class="spacer"></span>
+
+            <button mat-button [matMenuTriggerFor]="userMenu">
+                <mat-icon>person</mat-icon>
+                {{ userName }}
+            </button>
+            <mat-menu #userMenu="matMenu">
+                <button mat-menu-item (click)="profile()">
+                    <mat-icon>person_outline</mat-icon>
+                    Perfil
+                </button>
+                <button mat-menu-item (click)="logOut()">
+                    <mat-icon>logout</mat-icon>
+                    Cerrar sesión
+                </button>
+            </mat-menu>
+
+        </mat-toolbar-row>
+    </mat-toolbar>
+</div>
