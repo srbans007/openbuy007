@@ -1,0 +1,17 @@
+export interface Todo_carga {
+    id: number,
+    fecha_carga: string,
+    tienda: string,
+    boleta: string,
+    sku: string,
+    producto: string,
+    cantidad: number,
+    bulto: number,
+    rut_cliente: string,
+    fono_cliente: string,
+    email_cliente: string,
+    direccion_cliente: string,
+    comuna_cliente: string,
+    fecha_compromiso: string,
+    lpn: string
+}
