@@ -16,6 +16,47 @@
 
               </div>
                 <hr>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">id</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                      <th scope="col">asd</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of listGuias">
+                      <td>{{ item.id }}</td>
+                      <td>{{ item.fecha_carga }} </td>
+                      <td>{{ item.tienda }} </td>
+                      <td>{{ item.boleta }} </td>
+                      <td>{{ item.sku }} </td>
+                      <td>{{ item.producto }} </td>
+                      <td>{{ item.cantidad }} </td>
+                      <td>{{ item.bulto }} </td>
+                      <td>{{ item.rut_cliente }} </td>
+                      <td>{{ item.fono_cliente }} </td>
+                      <td>{{ item.email_cliente }} </td>
+                      <td>{{ item.direccion_cliente }} </td>
+                      <td>{{ item.comuna_cliente }} </td>
+                      <td>{{ item.fecha_compromiso }} </td>
+                      <td>{{ item.lpn }} </td>
+                    </tr>
+                   
+                  </tbody>
+                </table>
                   
                 <!--[rowData]="rowData$ | async""  es para indicar que es un observable-->
                     <!-- <ag-grid-angular
