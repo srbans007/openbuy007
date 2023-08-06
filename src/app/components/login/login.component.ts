@@ -24,6 +24,10 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  onEnterKey(): void {
+    this.login();
+  }
+
   login() {
 
     // Validamos que el usuario ingrese datos
