@@ -14,7 +14,7 @@ export class DashboardComponent{
   menuItems: Menu[] = [
     {path: '', title: 'Home', icon: 'home'},
     {path: 'carga-datos', title: 'Carga de datos', icon: 'cloud_upload'},
-    {path: 'todo-carga', title: 'TODO CARGA', icon: 'cloud_upload'}
+    {path: 'todo-carga', title: 'TODO CARGA', icon: 'menu_book'}
   ];
 
   constructor(

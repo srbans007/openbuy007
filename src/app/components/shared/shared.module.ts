@@ -32,6 +32,8 @@ import { MatNativeDateModule } from "@angular/material/core";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatTabsModule } from "@angular/material/tabs";
+import {AgGridModule} from "ag-grid-angular";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 // Third Party Imports
 import { ToastrModule } from 'ngx-toastr';
@@ -76,6 +78,8 @@ import { ToastrModule } from 'ngx-toastr';
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }), // ToastrModule added
+    AgGridModule
+    
   ],
   exports: [
     FormsModule,
@@ -109,7 +113,10 @@ import { ToastrModule } from 'ngx-toastr';
     MatProgressBarModule,
     MatCheckboxModule,
     MatTabsModule,
-    ToastrModule
+    ToastrModule,
+    AgGridModule
   ]
 })
 export class SharedModule { }
+export { AgGridModule };
+

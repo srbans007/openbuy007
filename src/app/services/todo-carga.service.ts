@@ -9,17 +9,24 @@ import { Todo_carga } from '../interfaces/todo-carga';
 })
 export class TodoCargaService {
   private myAppUrl: string;
-  private myApiUrl2: string;
+  private listar: string;
+  private insertar: string;
 
   constructor(private http: HttpClient) {
     this.myAppUrl = environment.endpoint;
-    this.myApiUrl2 = 'api/troncal'
+    this.listar = 'api/troncal'
+    this.insertar = 'api/troncal/insert'
   }
 
   getTodoCarga(): Observable<Todo_carga[]> {
     const token = localStorage.getItem('token')
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`)
-    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.myApiUrl2}`, { headers: headers })
-    //return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.myApiUrl2}`)
+    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.listar}`, { headers: headers })
+  }
+
+  insertTodoCarga(todoCarga: Todo_carga): Observable<Todo_carga> {
+    const token = localStorage.getItem('token')
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`)
+    return this.http.post<Todo_carga>(`${this.myAppUrl}${this.insertar}`, todoCarga, { headers: headers })
   }
 }
