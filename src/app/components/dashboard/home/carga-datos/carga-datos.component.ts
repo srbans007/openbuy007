@@ -58,16 +58,21 @@ export class CargaDatosComponent {
           verticalPosition: 'top'
         });
   
-        let datosSeguimiento = {
-          "id": data.id,
-          "boleta": data.boleta,
-          "guia": data.guia, 
-          "lpn": data.lpn,
-          "marcaPgd": data.marcaPgd
-        };
-
-        //console.log(datosSeguimiento)
-        console.log("datosqls",data)
+        let datosSeguimiento = data.map(
+          (item: {
+            boleta: string;
+            guia: string;
+            lpn: string;
+            marcaPgd: number;
+          }
+          ) => {
+            return {
+              "boleta": item.boleta,
+              "guia": item.guia,
+              "lpn": item.lpn,
+              "marcaPgd": item.marcaPgd
+            };
+          });
 
         this._SeguimientoService.insertSeguimiento(datosSeguimiento).subscribe({
           next: (data) => {

@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable} from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Todo_carga } from '../interfaces/todo-carga';
 import { SeguimientoService } from '../services/seguimiento.service';
@@ -16,8 +15,7 @@ export class TodoCargaService {
   private headers: HttpHeaders;
 
   constructor(
-    private http: HttpClient,
-    private _seguimientoService: SeguimientoService
+    private http: HttpClient
   ) {
 
     this.myAppUrl = `${environment.endpoint}api/troncal`;
