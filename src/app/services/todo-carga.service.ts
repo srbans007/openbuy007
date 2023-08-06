@@ -1,8 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable} from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Todo_carga } from '../interfaces/todo-carga';
+import { SeguimientoService } from '../services/seguimiento.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,22 +13,30 @@ export class TodoCargaService {
   private myAppUrl: string;
   private listar: string;
   private insertar: string;
+  private headers: HttpHeaders;
 
-  constructor(private http: HttpClient) {
-    this.myAppUrl = environment.endpoint;
-    this.listar = 'api/troncal'
-    this.insertar = 'api/troncal/insert'
+  constructor(
+    private http: HttpClient,
+    private _seguimientoService: SeguimientoService
+  ) {
+
+    this.myAppUrl = `${environment.endpoint}api/troncal`;
+    this.listar = ''
+    this.insertar = '/insert'
+
+    this.headers = this.createHeaders();
+  }
+
+  private createHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
   getTodoCarga(): Observable<Todo_carga[]> {
-    const token = localStorage.getItem('token')
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`)
-    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.listar}`, { headers: headers })
+    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.listar}`, { headers: this.headers });
   }
 
-  insertTodoCarga(todoCarga: Todo_carga): Observable<Todo_carga> {
-    const token = localStorage.getItem('token')
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`)
-    return this.http.post<Todo_carga>(`${this.myAppUrl}${this.insertar}`, todoCarga, { headers: headers })
+  insertTodoCarga(todoCarga: Todo_carga): Observable<any> {
+    return this.http.post<Todo_carga>(`${this.myAppUrl}${this.insertar}`, todoCarga, { headers: this.headers })
   }
 }

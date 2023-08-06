@@ -10,6 +10,7 @@ import { HomeComponent } from './home/home.component';
 import { CargaDatosComponent } from './home/carga-datos/carga-datos.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { TodoCargaComponent } from './home/todo-carga/todo-carga.component';
+import { SeguimientoComponent } from './home/seguimiento/seguimiento.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { TodoCargaComponent } from './home/todo-carga/todo-carga.component';
     HomeComponent,
     CargaDatosComponent,
     NavbarComponent,
-    TodoCargaComponent
+    TodoCargaComponent,
+    SeguimientoComponent
   ],
   imports: [
     CommonModule,

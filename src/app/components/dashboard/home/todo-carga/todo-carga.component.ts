@@ -19,10 +19,11 @@ onCellClicked($event: CellClickedEvent<any,any>) {
   private gridColumnApi!: ColumnApi;
   
   columnDefs = [
-    { field: 'id' },
+    { field: 'id', hide: true },
     { field: 'fecha_carga' },
     { field: 'tienda' },
     { field: 'boleta' },
+    { field: 'guia' },
     { field: 'sku' },
     { field: 'producto' },
     { field: 'cantidad' },

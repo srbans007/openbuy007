@@ -3,6 +3,7 @@ export interface Todo_carga {
     fecha_carga: string,
     tienda: string,
     boleta: string,
+    guia: string,
     sku: string,
     producto: string,
     cantidad: number,
@@ -13,5 +14,6 @@ export interface Todo_carga {
     direccion_cliente: string,
     comuna_cliente: string,
     fecha_compromiso: string,
-    lpn: string
+    lpn: string,
+    marcaPgd: number
 }
