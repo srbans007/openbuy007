@@ -1,7 +1,8 @@
 export interface Todo_carga {
     id: number,
     fecha_carga: string,
-    tienda: string,
+    sucursal: number,
+    tienda: number,
     boleta: string,
     guia: string,
     sku: string,

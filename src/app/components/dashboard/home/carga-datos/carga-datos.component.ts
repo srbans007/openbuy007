@@ -1,8 +1,13 @@
 import { Component } from '@angular/core';
 import * as XLSX from 'xlsx';
-import { TodoCargaService } from '../../../../services/todo-carga.service';
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { TodoCargaService } from '../../../../services/todo-carga.service';
 import { SeguimientoService } from 'src/app/services/seguimiento.service';
+import { TiendaService } from 'src/app/services/tienda.service';
+import { SucursalService } from 'src/app/services/sucursal.service';
+import { Tienda } from 'src/app/interfaces/tienda';
+import { Sucursal } from 'src/app/interfaces/sucursal';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-carga-datos',
@@ -13,28 +18,88 @@ export class CargaDatosComponent {
   fileName = '';
   fileData: any;
 
+  //usar interfaces para encontrar datos de tienda y sucursal
+  tiendas: Tienda[] = [];
+  sucursales: Sucursal[] = [];
+
   constructor(
+    private router: Router,
     private _TodoCargaService: TodoCargaService,
     private _SeguimientoService: SeguimientoService,
+    private _TiendaService: TiendaService,
+    private _SucursalService: SucursalService,
     private _snackBar: MatSnackBar
   ) { }
 
+  ngOnInit() {
+    this._TiendaService.getTienda().subscribe({
+      next: (t) => {
+        this.tiendas = t;
+      },
+      error: (error) => {
+        console.error('Ocurrió un error al obtener tiendas:', error);
+        if (error.status === 400) {
+          this.logOut();
+        }
+      },
+      complete: () => {
+        console.log('Data loading for tiendas complete');
+      }
+    });
+  
+    this._SucursalService.getSucursal().subscribe({
+      next: (s) => {
+        this.sucursales = s;
+      },
+      error: (error) => {
+        console.error('Ocurrió un error al obtener sucursales:', error);
+        if (error.status === 400) {
+          this.logOut();
+        }
+      },
+      complete: () => {
+        console.log('Data loading for sucursales complete');
+      }
+    });
+  }
+  
+
+  logOut() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login'])
+  }
+
+
   onFileSelected(event: any) {
     const target: DataTransfer = <DataTransfer>(event.target);
-  
+
     if (target.files && target.files.length > 0) {
       this.fileName = target.files[0].name;
       const reader: FileReader = new FileReader();
-  
+
       reader.onload = (e: any) => {
         const bstr: string = e.target.result;
         const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
         const wsname: string = wb.SheetNames[0];
         const ws: XLSX.WorkSheet = wb.Sheets[wsname];
         this.fileData = XLSX.utils.sheet_to_json(ws);
-  
+
+        for (let i = 0; i < this.fileData.length; i++) {
+          let tienda = this.tiendas.find(t => t.nombre_tienda === this.fileData[i].id_tienda);
+          let sucursal = this.sucursales.find(s => s.nombre_sucursal === this.fileData[i].id_sucursal);
+
+          if (tienda) {
+            this.fileData[i].id_tienda = tienda.id;
+          }
+
+          if (sucursal) {
+            this.fileData[i].id_sucursal = sucursal.id;
+          }
+        }
+
         // Agregar 1 a la columna 'marcaPgd' de cada objeto en 'this.fileData'
         for (let i = 0; i < this.fileData.length; i++) {
+
           if (this.fileData[i].hasOwnProperty('marcaPgd')) {
             this.fileData[i].marcaPgd += 1;
           } else {
@@ -43,47 +108,43 @@ export class CargaDatosComponent {
           }
         }
       };
-  
+
       reader.readAsBinaryString(target.files[0]);
     }
   }
 
   onUpload() {
     this._TodoCargaService.insertTodoCarga(this.fileData).subscribe({
-      
+
       next: (data) => {
         this._snackBar.open('Datos Insertados.', '', {
           duration: 2000,
           horizontalPosition: 'center',
           verticalPosition: 'top'
         });
-  
+
         let datosSeguimiento = data.map(
           (item: {
-            boleta: string;
-            guia: string;
-            lpn: string;
+            id: number;
             marcaPgd: number;
           }
           ) => {
             return {
-              "boleta": item.boleta,
-              "guia": item.guia,
-              "lpn": item.lpn,
+              "id_guia": item.id,
               "marcaPgd": item.marcaPgd
             };
           });
 
         this._SeguimientoService.insertSeguimiento(datosSeguimiento).subscribe({
           next: (data) => {
-            console.log('Seguimiento data uploaded successfully', data);
+            console.log('Seguimiento cargado', data);
           },
           error: (error) => {
-            console.error('Something went wrong with seguimiento data', error);
+            console.error('Error seguimiento', error);
           }
         });
-  
-        console.log('TodoCarga data uploaded successfully', data);
+
+        console.log('TodoCarga cargado', data);
       },
       error: (error) => {
         this._snackBar.open('ERROR.', '', {
@@ -91,16 +152,16 @@ export class CargaDatosComponent {
           horizontalPosition: 'center',
           verticalPosition: 'top'
         });
-  
-        console.error('Something went wrong with TodoCarga data', error);
+
+        console.error('Error TodoCarga', error);
       },
       complete: () => {
         this.fileName = '';
         this.fileData = null;
-  
-        console.log('TodoCarga data upload completed');
+
+        console.log('TodoCarga completo');
       },
     });
   }
-  
+
 }

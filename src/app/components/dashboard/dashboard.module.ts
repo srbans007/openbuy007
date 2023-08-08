@@ -11,6 +11,9 @@ import { CargaDatosComponent } from './home/carga-datos/carga-datos.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { TodoCargaComponent } from './home/todo-carga/todo-carga.component';
 import { SeguimientoComponent } from './home/seguimiento/seguimiento.component';
+import { SucursalesComponent } from './home/mantenedores/sucursales/sucursales.component';
+import { TiendasComponent } from './home/mantenedores/tiendas/tiendas.component';
+import { MantenedoresComponent } from './home/mantenedores/mantenedores.component';
 
 
 @NgModule({
@@ -20,7 +23,10 @@ import { SeguimientoComponent } from './home/seguimiento/seguimiento.component';
     CargaDatosComponent,
     NavbarComponent,
     TodoCargaComponent,
-    SeguimientoComponent
+    SeguimientoComponent,
+    SucursalesComponent,
+    TiendasComponent,
+    MantenedoresComponent
   ],
   imports: [
     CommonModule,

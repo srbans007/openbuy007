@@ -1,6 +1,5 @@
 export interface Seguimiento {
-    boleta: string,
-    guia: string,
-    lpn: string,
+    id: number,
+    id_guia: number,
     marcaPgd: number
 }

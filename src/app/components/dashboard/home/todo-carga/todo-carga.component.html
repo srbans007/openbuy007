@@ -7,18 +7,18 @@
                 <div class="dense-3">
                   <mat-form-field appearance="outline">
                     <mat-label>Busqueda rápida</mat-label>
-                    <!-- <input matInput placeholder="" #filterInput (keyup)="setFilter(filterInput.value)"> -->
-                    <input matInput placeholder="" #filterInput>
+                    <input matInput placeholder="" #filterInput (keyup)="setFilter(filterInput.value)">
                   </mat-form-field>
                 </div>
                 <!-- <button mat-raised-button color="warn" (click)="onSubmit()">Eliminar</button> -->
-                <button mat-raised-button color="warn" >Eliminar</button>
+                <!-- <button mat-raised-button color="warn" >Eliminar</button> -->
+                <button mat-raised-button color="primary" (click)="onExportClick()">Excel</button>
 
               </div>
                 <hr>
                 <!--[rowData]="rowData$ | async""  es para indicar que es un observable-->
                     <ag-grid-angular
-                        style="width: 100%; height: calc(300px)"
+                        style="width: 100%; height: calc(500px)"
                         class="ag-theme-alpine"
                         [columnDefs]="columnDefs"
                         [defaultColDef]="defaultColDef"
@@ -28,6 +28,7 @@
                         (gridReady)="onGridReady($event)"
                         (cellClicked)="onCellClicked($event)"
                     ></ag-grid-angular>
+                    
             </mat-card-content>
         </mat-card>
     </div>
