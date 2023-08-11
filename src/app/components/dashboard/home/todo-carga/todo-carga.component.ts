@@ -2,8 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Todo_carga } from 'src/app/interfaces/todo-carga';
 import { TodoCargaService } from 'src/app/services/todo-carga.service';
 import { Router } from '@angular/router';
-import { AgGridModule } from "src/app/components/shared/shared.module";
-import { ColDef, ColumnApi, GridReadyEvent, CellClickedEvent } from 'ag-grid-community';
+import { ColDef, ColumnApi, CellClickedEvent } from 'ag-grid-community';
 import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
 import { Tienda } from 'src/app/interfaces/tienda';
 import { Sucursal } from 'src/app/interfaces/sucursal';
@@ -21,7 +20,7 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./todo-carga.component.scss']
 })
 export class TodoCargaComponent {
-  sideBar = true;
+
   //traemos los datos para la tabla
   tiendas: Tienda[] = [];
   sucursales: Sucursal[] = [];
@@ -35,14 +34,14 @@ export class TodoCargaComponent {
 
   columnDefs = [
     { field: 'id', hide: true },
-    { field: 'fecha_carga', headerName: 'Fecha de Carga'},
+    { field: 'fecha_carga', headerName: 'Fecha de Carga' },
     {
       field: 'id_tienda',
       headerName: 'Tienda',
       valueGetter: (params: { data: { id_tienda: number; }; }) => {
         const tienda = this.tiendas.find(t => t.id === params.data.id_tienda);
         return tienda ? tienda.nombre_tienda : '';
-    }
+      }
     },
     {
       field: 'id_sucursal',
@@ -50,7 +49,7 @@ export class TodoCargaComponent {
       valueGetter: (params: { data: { id_sucursal: number; }; }) => {
         const sucursal = this.sucursales.find(s => s.id === params.data.id_sucursal);
         return sucursal ? sucursal.nombre_sucursal : '';
-    }
+      }
     },
     { field: 'boleta' },
     { field: 'guia' },
@@ -71,10 +70,6 @@ export class TodoCargaComponent {
     sortable: true,
     filter: true,
   };
-
-  // sideBar = {
-  //   toolPanels: ['columns']
-  // };
 
   public rowData$!: Todo_carga[];
 
@@ -141,7 +136,7 @@ export class TodoCargaComponent {
     // Obtener las filas filtradas
     const filteredRows: any[] = [];
     this.gridApi.forEachNodeAfterFilter((node) => {
-        filteredRows.push(node.data);
+      filteredRows.push(node.data);
     });
 
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredRows);
@@ -149,6 +144,6 @@ export class TodoCargaComponent {
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
     // Guardar archivo
-    XLSX.writeFile(wb, 'nombre_del_archivo.xlsx');
+    XLSX.writeFile(wb, 'sucursales.xlsx');
   }
 }

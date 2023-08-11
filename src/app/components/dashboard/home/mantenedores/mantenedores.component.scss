@@ -1,0 +1,13 @@
+.selector-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    mat-form-field {
+        flex: 1;
+    }
+
+    button {
+        margin-left: 0.5rem; // Equivalente a la clase .ml-2 de Bootstrap
+    }
+}

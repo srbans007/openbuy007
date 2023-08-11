@@ -14,6 +14,7 @@ import { SeguimientoComponent } from './home/seguimiento/seguimiento.component';
 import { SucursalesComponent } from './home/mantenedores/sucursales/sucursales.component';
 import { TiendasComponent } from './home/mantenedores/tiendas/tiendas.component';
 import { MantenedoresComponent } from './home/mantenedores/mantenedores.component';
+import { ModalMantComponent } from './home/mantenedores/modal-mant/modal-mant.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { MantenedoresComponent } from './home/mantenedores/mantenedores.componen
     SeguimientoComponent,
     SucursalesComponent,
     TiendasComponent,
-    MantenedoresComponent
+    MantenedoresComponent,
+    ModalMantComponent
   ],
   imports: [
     CommonModule,

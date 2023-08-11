@@ -1,3 +1,27 @@
 <h1 class="Mantenedores">Mantenedores</h1>
-<app-tiendas></app-tiendas>
-<app-sucursales></app-sucursales>
+
+<div class="row">
+    <!-- Primera parte -->
+    <div class="col-md-4 selector-container">
+        <mat-form-field>
+            <mat-label>seleccione mantenedor</mat-label>
+            <mat-select [(ngModel)]="selectedMantenedor">
+                <mat-option *ngFor="let mant of mantenedores" [value]="mant">
+                    {{mant.viewValueMant}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <button mat-raised-button (click)="openDialog()" class="ml-2">Selecciona uno</button>
+    </div>
+    
+    <!-- Segunda parte (con el selector y el botón) -->
+    <div class="col-md-4">
+        
+    </div>
+    
+    <!-- Tercera parte -->
+    <div class="col-md-4">
+        <!-- Aquí puedes agregar contenido adicional si lo deseas -->
+    </div>
+</div>
+

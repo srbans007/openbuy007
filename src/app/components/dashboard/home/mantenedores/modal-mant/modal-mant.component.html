@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>{{data.viewValueMant}}</h1>
+
+<div mat-dialog-content>
+  <app-tiendas *ngIf="data.valueMant === 'tienda-0'"></app-tiendas>
+  <app-sucursales *ngIf="data.valueMant === 'sucursal-1'"></app-sucursales>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()" color="warn">Cerrar</button>
+</div>
