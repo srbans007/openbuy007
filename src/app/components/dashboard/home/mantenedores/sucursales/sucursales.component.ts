@@ -1,15 +1,13 @@
-import { Component, ViewChild } from '@angular/core';
-import { TodoCargaService } from 'src/app/services/todo-carga.service';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ColDef, ColumnApi, CellClickedEvent } from 'ag-grid-community';
-import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
-import { Tienda } from 'src/app/interfaces/tienda';
+import { AgGridService } from 'src/app/services/ag-grid.service';
 import { Sucursal } from 'src/app/interfaces/sucursal';
-import { TiendaService } from 'src/app/services/tienda.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi } from 'ag-grid-community';
 import * as XLSX from 'xlsx';
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-sucursales',
@@ -17,43 +15,45 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./sucursales.component.scss']
 })
 export class SucursalesComponent {
-  sucursales: Sucursal[] = [];
-  onCellClicked($event: CellClickedEvent<any, any>) {
 
-  }
-  //private gridApi!: AgGridModule;
+  // Propiedades
+  sucursales: Sucursal[] = [];
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
-
+  public rowData$!: Sucursal[];
+  newSucursales: Sucursal[] = [
+    { nombre_sucursal: '' }
+  ];
   columnDefs = [
     { field: 'id', hide: true },
     { field: 'nombre_sucursal', headerName: 'Sucursal' },
     { field: 'createdAt', headerName: 'Fecha Creación' },
     { field: 'updatedAt', headerName: 'Última actualización' },
   ];
-
   public defaultColDef: ColDef = {
     sortable: true,
     filter: true,
   };
 
-  public rowData$!: Sucursal[];
-
-  // For accessing the Grid's API
+  // Referencias
   @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
+  @ViewChild('filterInput') filterInput!: ElementRef;
 
+  // Constructor e inicialización
   constructor(
     private router: Router,
     private _agGridService: AgGridService,
-    private _SucursalService: SucursalService
+    private _SucursalService: SucursalService,
+    private _snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
-
     this._SucursalService.getSucursal().subscribe(s => {
       this.sucursales = s;
     });
   }
+
+  // Métodos del ciclo de vida de Angular
 
   onGridReady(params: any) {
     this.gridApi = params.api;
@@ -77,6 +77,36 @@ export class SucursalesComponent {
       },
       complete: () => {
         console.log('Data loading complete');
+      }
+    });
+  }
+
+
+  onAddClick() {
+    this._SucursalService.insertSucursal(this.newSucursales).subscribe({
+      next: (sucursal) => {
+        console.log('Sucursal agregada:', sucursal);
+        this._snackBar.open('Sucursal Agregada', '', {
+          duration: 2000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        // Si el backend responde con una sucursal, la agregas al array de sucursales
+        if (Array.isArray(sucursal)) {
+          this.sucursales.push(...sucursal);
+          this.getGuias();
+          this.filterInput.nativeElement.focus(); // Enfocar el campo de búsqueda
+          this.newSucursales[0].nombre_sucursal = '';
+        } else {
+          this.sucursales.push(sucursal);
+        }
+      },
+      error: (error) => {
+        console.error('Ocurrió un error:', error);
+        // Maneja el error según tus necesidades (e.g., muestra una notificación al usuario)
+      },
+      complete: () => {
+        console.log('Operación de inserción completa.');
       }
     });
   }
@@ -106,7 +136,7 @@ export class SucursalesComponent {
     XLSX.writeFile(wb, 'sucursales.xlsx');
   }
 
-  onAddClick(){
-
+  onCellClicked($event: CellClickedEvent<any, any>) {
+    // ...
   }
 }

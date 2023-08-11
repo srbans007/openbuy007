@@ -30,7 +30,7 @@ export class SucursalService {
     return this.http.get<Sucursal[]>(`${this.myAppUrl}${this.listar}`, { headers: this.headers });
   }
 
-  insertSucursal(sucursal: Sucursal): Observable<Sucursal> {
-    return this.http.post<Sucursal>(`${this.myAppUrl}${this.insertar}`, sucursal, { headers: this.headers });
+  insertSucursal(sucursales: Sucursal[]): Observable<Sucursal[]> {
+    return this.http.post<Sucursal[]>(`${this.myAppUrl}${this.insertar}`, sucursales, { headers: this.headers });
   }
 }

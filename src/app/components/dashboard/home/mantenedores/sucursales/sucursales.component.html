@@ -17,7 +17,7 @@
                 <div class="dense-3">
                     <mat-form-field appearance="outline">
                       <mat-label>Agregar Nueva Sucursal</mat-label>
-                      <input matInput placeholder="" #addInput>
+                      <input matInput #sendNameSuc [(ngModel)]="newSucursales[0].nombre_sucursal" placeholder="Nombre de Sucursal">
                     </mat-form-field>
                   </div>
                 <button mat-raised-button color="warn" (click)="onAddClick()">Agregar</button>
