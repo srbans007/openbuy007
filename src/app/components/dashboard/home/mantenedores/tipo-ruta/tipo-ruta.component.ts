@@ -4,12 +4,13 @@ import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams } from 'ag-gri
 import { AgGridService } from 'src/app/services/ag-grid.service';
 import { TipoRuta } from 'src/app/interfaces/tipoRuta';
 import { TipoRutaService } from 'src/app/services/tipo-ruta.service';
+import { Sucursal } from 'src/app/interfaces/sucursal';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi } from 'ag-grid-community';
 import * as XLSX from 'xlsx';
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Sucursal } from 'src/app/interfaces/sucursal';
+
 
 @Component({
   selector: 'app-tipo-ruta',

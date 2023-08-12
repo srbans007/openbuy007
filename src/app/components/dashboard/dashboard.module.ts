@@ -16,6 +16,8 @@ import { TiendasComponent } from './home/mantenedores/tiendas/tiendas.component'
 import { MantenedoresComponent } from './home/mantenedores/mantenedores.component';
 import { ModalMantComponent } from './home/mantenedores/modal-mant/modal-mant.component';
 import { TipoRutaComponent } from './home/mantenedores/tipo-ruta/tipo-ruta.component';
+import { VehiculoComponent } from './home/mantenedores/vehiculo/vehiculo.component';
+import { TransportistaComponent } from './home/mantenedores/transportista/transportista.component';
 
 
 @NgModule({
@@ -30,7 +32,9 @@ import { TipoRutaComponent } from './home/mantenedores/tipo-ruta/tipo-ruta.compo
     TiendasComponent,
     MantenedoresComponent,
     ModalMantComponent,
-    TipoRutaComponent
+    TipoRutaComponent,
+    VehiculoComponent,
+    TransportistaComponent
   ],
   imports: [
     CommonModule,

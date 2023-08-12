@@ -47,6 +47,7 @@ export class MantenedoresComponent {
     {valueMant: 'tienda-0', viewValueMant: 'Tienda'},
     {valueMant: 'sucursal-1', viewValueMant: 'Sucursal'},
     {valueMant: 'tipoRuta-2', viewValueMant: 'Tipo Ruta'},
+    {valueMant: 'vehiculo-3', viewValueMant: 'Vehiculo'},
   ];
 
 }
