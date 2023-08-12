@@ -11,12 +11,14 @@ export class TiendaService {
   private myAppUrl: string;
   private listar: string;
   private insertar: string;
+  private eliminar: string;
   private headers: HttpHeaders;
 
   constructor(private http: HttpClient) {
     this.myAppUrl = `${environment.endpoint}api/tienda`;
     this.listar = ''
     this.insertar = '/insert'
+    this.eliminar = '/eliminar'
 
     this.headers = this.createHeaders();
   }
@@ -30,7 +32,11 @@ export class TiendaService {
     return this.http.get<Tienda[]>(`${this.myAppUrl}${this.listar}`, { headers: this.headers });
   }
 
-  insertTienda(tienda: Tienda): Observable<Tienda> {
-    return this.http.post<Tienda>(`${this.myAppUrl}${this.insertar}`, tienda, { headers: this.headers });
+  insertTienda(tienda: Tienda[]): Observable<Tienda[]> {
+    return this.http.post<Tienda[]>(`${this.myAppUrl}${this.insertar}`, tienda, { headers: this.headers });
+  }
+
+  destroyTienda(tienda: Tienda[]): Observable<Tienda[]> {
+    return this.http.post<Tienda[]>(`${this.myAppUrl}${this.eliminar}`, tienda, { headers: this.headers });
   }
 }

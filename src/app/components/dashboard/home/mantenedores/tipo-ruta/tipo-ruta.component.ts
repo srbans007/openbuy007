@@ -2,31 +2,43 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams } from 'ag-grid-community';
 import { AgGridService } from 'src/app/services/ag-grid.service';
-import { Sucursal } from 'src/app/interfaces/sucursal';
+import { TipoRuta } from 'src/app/interfaces/tipoRuta';
+import { TipoRutaService } from 'src/app/services/tipo-ruta.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi } from 'ag-grid-community';
 import * as XLSX from 'xlsx';
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { Sucursal } from 'src/app/interfaces/sucursal';
 
 @Component({
-  selector: 'app-sucursales',
-  templateUrl: './sucursales.component.html',
-  styleUrls: ['./sucursales.component.scss']
+  selector: 'app-tipo-ruta',
+  templateUrl: './tipo-ruta.component.html',
+  styleUrls: ['./tipo-ruta.component.scss']
 })
-export class SucursalesComponent {
-
+export class TipoRutaComponent {
   // Propiedades
-  sucursales: Sucursal[] = [];
+  sucursal: Sucursal[] = [];
+  tipoRuta: TipoRuta[] = [];
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
-  public rowData$!: Sucursal[];
-  newSucursales: Sucursal[] = [
-    { nombre_sucursal: '' }
+  public rowData$!: TipoRuta[];
+  newRuta: TipoRuta[] = [
+    {
+      nombre_ruta: ''
+    }
   ];
   columnDefs = [
     { field: 'id', hide: true },
-    { field: 'nombre_sucursal', headerName: 'Sucursal' },
+    {
+      field: 'id_sucursal',
+      headerName: 'Sucursal',
+      valueGetter: (params: { data: { id_sucursal: number; }; }) => {
+        const sucursal = this.sucursal.find(s => s.id === params.data.id_sucursal);
+        return sucursal ? sucursal.nombre_sucursal : '';
+      }
+    },
+    { field: 'nombre_ruta', headerName: 'Tipo Ruta' },
     { field: 'createdAt', headerName: 'Fecha Creación' },
     { field: 'updatedAt', headerName: 'Última actualización' },
     {
@@ -39,11 +51,11 @@ export class SucursalesComponent {
       sortable: false
     }
   ];
+
   public defaultColDef: ColDef = {
     sortable: true,
     filter: true,
   };
-
   // Referencias
   @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
   @ViewChild('filterInput') filterInput!: ElementRef;
@@ -52,13 +64,40 @@ export class SucursalesComponent {
   constructor(
     private router: Router,
     private _agGridService: AgGridService,
+    private _TipoRutaService: TipoRutaService,
     private _SucursalService: SucursalService,
     private _snackBar: MatSnackBar
   ) { }
 
-  ngOnInit(): void {
-    this._SucursalService.getSucursal().subscribe(s => {
-      this.sucursales = s;
+  ngOnInit() {
+    this._TipoRutaService.getTipoRuta().subscribe({
+      next: (t) => {
+        this.tipoRuta = t;
+      },
+      error: (error) => {
+        console.error('Ocurrió un error al obtener tiendas:', error);
+        if (error.status === 400) {
+          this.logOut();
+        }
+      },
+      complete: () => {
+        console.log('Data loading for tiendas complete');
+      }
+    });
+
+    this._SucursalService.getSucursal().subscribe({
+      next: (s) => {
+        this.sucursal = s;
+      },
+      error: (error) => {
+        console.error('Ocurrió un error al obtener sucursales:', error);
+        if (error.status === 400) {
+          this.logOut();
+        }
+      },
+      complete: () => {
+        console.log('Data loading for sucursales complete');
+      }
     });
   }
 
@@ -69,11 +108,11 @@ export class SucursalesComponent {
     this.gridColumnApi = params.columnApi;
     this.getGuias();
     this._agGridService.autoSizeAll(this.gridColumnApi, false);
-    
+
   }
 
   getGuias() {
-    this._SucursalService.getSucursal().subscribe({
+    this._TipoRutaService.getTipoRuta().subscribe({
       next: data => {
         this.rowData$ = data;
         console.log("Data received", data);
@@ -90,24 +129,23 @@ export class SucursalesComponent {
     });
   }
 
-
   onAddClick() {
-    this._SucursalService.insertSucursal(this.newSucursales).subscribe({
-      next: (sucursal) => {
-        console.log('Sucursal agregada:', sucursal);
-        this._snackBar.open('Sucursal Agregada', '', {
+    this._TipoRutaService.insertTipoRuta(this.newRuta).subscribe({
+      next: (tipoRuta) => {
+        console.log('Ruta agregada:', tipoRuta);
+        this._snackBar.open('Ruta Agregada', '', {
           duration: 2000,
           horizontalPosition: 'center',
           verticalPosition: 'top'
         });
         // Si el backend responde con una sucursal, la agregas al array de sucursales
-        if (Array.isArray(sucursal)) {
-          this.sucursales.push(...sucursal);
+        if (Array.isArray(tipoRuta)) {
+          this.tipoRuta.push(...tipoRuta);
           this.getGuias();
           this.filterInput.nativeElement.focus(); // Enfocar el campo de búsqueda
-          this.newSucursales[0].nombre_sucursal = '';
+          this.newRuta[0].nombre_ruta = '';
         } else {
-          this.sucursales.push(sucursal);
+          this.tipoRuta.push(tipoRuta)
         }
       },
       error: (error) => {
@@ -122,16 +160,16 @@ export class SucursalesComponent {
 
   deleteRow(data: any) {
     const dataToSend = [{ id: data.id }];
-    
+
     let snackBarRef = this._snackBar.open('¿Está seguro de que desea eliminar este registro?', 'Eliminar', {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
     });
-  
+
     snackBarRef.onAction().subscribe(() => {
       // Si el usuario hace clic en 'Eliminar', procede a eliminar el registro
-      this._SucursalService.destroySucursal(dataToSend).subscribe({
+      this._TipoRutaService.destroyTipoRuta(dataToSend).subscribe({
         next: (deletedData) => {
           console.log('Registro eliminado:', deletedData);
           this._snackBar.open('Registro eliminado', '', {
@@ -147,12 +185,6 @@ export class SucursalesComponent {
         }
       });
     });
-  }
-
-  //si no hay token o hay manoseo de token pa juerah
-  logOut() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/login'])
   }
 
   setFilter(searchText: string) {
@@ -171,6 +203,13 @@ export class SucursalesComponent {
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
     // Guardar archivo
-    XLSX.writeFile(wb, 'sucursales.xlsx');
+    XLSX.writeFile(wb, 'rutas.xlsx');
   }
+
+  //si no hay token o hay manoseo de token pa juerah
+  logOut() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login'])
+  }
+
 }

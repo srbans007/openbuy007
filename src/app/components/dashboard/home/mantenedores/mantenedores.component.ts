@@ -30,8 +30,8 @@ export class MantenedoresComponent {
     }
     // Código existente para abrir el diálogo.
     const dialogRef = this.dialog.open(ModalMantComponent, {
-      width: '60%',
-      height: '80%',
+      // width: '60%',
+      // height: '80%',
       data: this.selectedMantenedor
     });
 
@@ -46,6 +46,7 @@ export class MantenedoresComponent {
   mantenedores: DialogMant[] = [
     {valueMant: 'tienda-0', viewValueMant: 'Tienda'},
     {valueMant: 'sucursal-1', viewValueMant: 'Sucursal'},
+    {valueMant: 'tipoRuta-2', viewValueMant: 'Tipo Ruta'},
   ];
 
 }

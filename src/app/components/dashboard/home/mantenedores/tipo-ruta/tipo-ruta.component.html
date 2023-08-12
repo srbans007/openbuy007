@@ -15,10 +15,22 @@
   
             <div class="dense-1">
               <mat-form-field appearance="outline">
-                <mat-label>Agregar Nueva Tienda</mat-label>
-                <input matInput #sendNameSuc [(ngModel)]="newTiendas[0].nombre_tienda"
-                  placeholder="Nombre de Tienda">
+                <mat-label>Seleccionar Sucursal</mat-label>
+                <mat-select [(ngModel)]="newRuta[0].id_sucursal">
+                  <mat-option *ngFor="let sucursal of sucursal" [value]="sucursal.id">
+                    {{ sucursal.nombre_sucursal }}
+                  </mat-option>
+                </mat-select>
               </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Agregar Nueva Ruta</mat-label>
+                <input matInput #sendNameSuc [(ngModel)]="newRuta[0].nombre_ruta"
+                  placeholder="Rutas Disponibles">
+              </mat-form-field>
+
+              
+              
             </div>
             <button mat-raised-button color="warn" (click)="onAddClick()">Agregar</button>
   
@@ -44,3 +56,4 @@
     </div>
   
   </div>
+

@@ -15,6 +15,7 @@ import { SucursalesComponent } from './home/mantenedores/sucursales/sucursales.c
 import { TiendasComponent } from './home/mantenedores/tiendas/tiendas.component';
 import { MantenedoresComponent } from './home/mantenedores/mantenedores.component';
 import { ModalMantComponent } from './home/mantenedores/modal-mant/modal-mant.component';
+import { TipoRutaComponent } from './home/mantenedores/tipo-ruta/tipo-ruta.component';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { ModalMantComponent } from './home/mantenedores/modal-mant/modal-mant.co
     SucursalesComponent,
     TiendasComponent,
     MantenedoresComponent,
-    ModalMantComponent
+    ModalMantComponent,
+    TipoRutaComponent
   ],
   imports: [
     CommonModule,

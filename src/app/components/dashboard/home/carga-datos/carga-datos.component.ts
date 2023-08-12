@@ -28,7 +28,8 @@ export class CargaDatosComponent {
     private _SeguimientoService: SeguimientoService,
     private _TiendaService: TiendaService,
     private _SucursalService: SucursalService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+
   ) { }
 
   ngOnInit() {
@@ -46,7 +47,7 @@ export class CargaDatosComponent {
         console.log('Data loading for tiendas complete');
       }
     });
-  
+
     this._SucursalService.getSucursal().subscribe({
       next: (s) => {
         this.sucursales = s;
@@ -62,13 +63,26 @@ export class CargaDatosComponent {
       }
     });
   }
-  
+
 
   logOut() {
     localStorage.removeItem('token');
     this.router.navigate(['/login'])
   }
 
+
+  private serialDateToISO(serialDate: number): string {
+    // La fecha de inicio para Excel es típicamente 1900-01-01, pero debido a un error en Excel
+    // el 1900 es considerado como un año bisiesto, así que debemos ajustar si es antes del 1900-03-01.
+    const startDate = new Date(1900, 0, 1);
+    if (serialDate > 59) {
+        serialDate--;
+    }
+
+    // Calcula la fecha final sumando los días del número de serie a la fecha de inicio.
+    const resultDate = new Date(startDate.getTime() + (serialDate - 1) * 24 * 60 * 60 * 1000);
+    return resultDate.toISOString().split('T')[0];  // Devuelve la fecha en formato YYYY-MM-DD
+}
 
   onFileSelected(event: any) {
     const target: DataTransfer = <DataTransfer>(event.target);
@@ -95,11 +109,17 @@ export class CargaDatosComponent {
           if (sucursal) {
             this.fileData[i].id_sucursal = sucursal.id;
           }
-        }
 
-        // Agregar 1 a la columna 'marcaPgd' de cada objeto en 'this.fileData'
-        for (let i = 0; i < this.fileData.length; i++) {
+          // Transforma las fechas si existen
+          if (this.fileData[i].hasOwnProperty('fecha_carga')) {
+            this.fileData[i].fecha_carga = this.serialDateToISO(this.fileData[i].fecha_carga);
+            console.log('fecha', this.fileData)
+          }
+          if (this.fileData[i].hasOwnProperty('fecha_compromiso')) {
+              this.fileData[i].fecha_compromiso = this.serialDateToISO(this.fileData[i].fecha_compromiso);
+          }
 
+          // Agregar 1 a la columna 'marcaPgd' de cada objeto en 'this.fileData'
           if (this.fileData[i].hasOwnProperty('marcaPgd')) {
             this.fileData[i].marcaPgd += 1;
           } else {
@@ -112,6 +132,7 @@ export class CargaDatosComponent {
       reader.readAsBinaryString(target.files[0]);
     }
   }
+
 
   onUpload() {
     this._TodoCargaService.insertTodoCarga(this.fileData).subscribe({
