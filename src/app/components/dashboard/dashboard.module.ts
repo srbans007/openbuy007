@@ -18,6 +18,8 @@ import { ModalMantComponent } from './home/mantenedores/modal-mant/modal-mant.co
 import { TipoRutaComponent } from './home/mantenedores/tipo-ruta/tipo-ruta.component';
 import { VehiculoComponent } from './home/mantenedores/vehiculo/vehiculo.component';
 import { TransportistaComponent } from './home/mantenedores/transportista/transportista.component';
+import { TipoTransporteComponent } from './home/mantenedores/tipo-transporte/tipo-transporte.component';
+import { TipoTimComponent } from './home/mantenedores/tipo-tim/tipo-tim.component';
 
 
 @NgModule({
@@ -34,7 +36,9 @@ import { TransportistaComponent } from './home/mantenedores/transportista/transp
     ModalMantComponent,
     TipoRutaComponent,
     VehiculoComponent,
-    TransportistaComponent
+    TransportistaComponent,
+    TipoTransporteComponent,
+    TipoTimComponent
   ],
   imports: [
     CommonModule,

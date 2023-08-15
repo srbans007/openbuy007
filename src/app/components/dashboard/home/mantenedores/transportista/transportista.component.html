@@ -1,1 +1,60 @@
-<p>transportista works!</p>
+<div class="grid-col-1">
+  <div class="grid-item">
+    <!-- <h1 style="padding-left: 10px; margin: 0 !important">Listado Sucursales</h1> -->
+    <mat-card>
+      <mat-card-content class="container">
+        <div class="button-container">
+          <div class="dense-1">
+            <mat-form-field appearance="outline">
+              <mat-label>Busqueda rápida</mat-label>
+              <input matInput placeholder="" #filterInput (keyup)="setFilter(filterInput.value)">
+            </mat-form-field>
+          </div>
+
+          <button mat-raised-button color="primary" (click)="onExportClick()">Excel</button>
+
+          <div class="dense-1">
+            <mat-form-field appearance="outline">
+              <mat-label>Sucursal</mat-label>
+              <mat-select [(ngModel)]="newTransportista[0].id_sucursal">
+                <mat-option *ngFor="let sucursal of sucursal" [value]="sucursal.id">
+                  {{ sucursal.nombre_sucursal }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo Transportista</mat-label>
+              <mat-select [(ngModel)]="newTransportista[0].id_transporte">
+                <mat-option *ngFor="let tipoTransporte of tipoTransporte" [value]="tipoTransporte.id">
+                  {{ tipoTransporte.transporte }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input matInput #sendNameSuc [(ngModel)]="newTransportista[0].nombres" placeholder="Nombres">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Apellido</mat-label>
+              <input matInput #sendNameSuc [(ngModel)]="newTransportista[0].apellidos" placeholder="Apellidos">
+            </mat-form-field>
+
+          </div>
+          <button mat-raised-button color="warn" (click)="onAddClick()">Agregar</button>
+
+        </div>
+        <hr>
+        <!--[rowData]="rowData$ | async""  es para indicar que es un observable-->
+        <!-- [rowSelection]="'multiple'" -->
+        <ag-grid-angular style="width: 100%; height: calc(450px)" class="ag-theme-alpine" [columnDefs]="columnDefs"
+          [defaultColDef]="defaultColDef" [rowData]="rowData$" [copyHeadersToClipboard]="true" [animateRows]="true"
+          [enableCellTextSelection]="true" [suppressCopyRowsToClipboard]="false" (gridReady)="onGridReady($event)">
+        </ag-grid-angular>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>
