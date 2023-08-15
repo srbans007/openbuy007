@@ -1,1 +1,48 @@
-<p>tipo-tim works!</p>
+<div class="grid-col-1">
+    <div class="grid-item">
+      <!-- <h1 style="padding-left: 10px; margin: 0 !important">Listado Sucursales</h1> -->
+      <mat-card>
+        <mat-card-content class="container">
+          <div class="button-container">
+            <div class="dense-1">
+              <mat-form-field appearance="outline">
+                <mat-label>Busqueda rápida</mat-label>
+                <input matInput placeholder="" #filterInput (keyup)="setFilter(filterInput.value)">
+              </mat-form-field>
+            </div>
+  
+            <button mat-raised-button color="primary" (click)="onExportClick()">Excel</button>
+  
+            <div class="dense-1">
+              <mat-form-field appearance="outline">
+                <mat-label>Agregar Tipo Tim</mat-label>
+                <input matInput #sendNameSuc [(ngModel)]="newTim[0].nombreTim"
+                  placeholder="Tipo Transporte">
+              </mat-form-field>
+            </div>
+            <button mat-raised-button color="warn" (click)="onAddClick()">Agregar</button>
+  
+          </div>
+          <hr>
+          <!--[rowData]="rowData$ | async""  es para indicar que es un observable-->
+          <!-- [rowSelection]="'multiple'" -->
+          <ag-grid-angular 
+            style="width: 100%; height: calc(450px)" 
+            class="ag-theme-alpine" 
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef" 
+            [rowData]="rowData$" 
+            [copyHeadersToClipboard]="true" 
+            [animateRows]="true"
+            [enableCellTextSelection]="true"
+            [suppressCopyRowsToClipboard]="false"
+            (gridReady)="onGridReady($event)"
+            >
+          </ag-grid-angular>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  
+  </div>
+
+

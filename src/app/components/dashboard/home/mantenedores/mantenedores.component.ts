@@ -50,6 +50,7 @@ export class MantenedoresComponent {
     {valueMant: 'vehiculo-3', viewValueMant: 'Vehiculo'},
     {valueMant: 'tipoTransporte-4', viewValueMant: 'Tipo Transporte'},
     {valueMant: 'transportista-5', viewValueMant: 'Transportista'},
+    {valueMant: 'tim-6', viewValueMant: 'Tipo TIM'},
   ];
 
 }
