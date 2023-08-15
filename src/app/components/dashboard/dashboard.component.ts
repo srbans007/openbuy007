@@ -15,7 +15,8 @@ export class DashboardComponent{
     {path: '', title: 'Home', icon: 'home'},
     {path: 'mantenedores', title: 'MANTENEDORES', icon: 'engineering'},
     {path: 'carga-datos', title: 'CARGA DE DATOS', icon: 'cloud_upload'},
-    {path: 'todo-carga', title: 'TODO CARGA', icon: 'menu_book'}
+    {path: 'todo-carga', title: 'TODO CARGA', icon: 'menu_book'},
+    {path: 'ruta', title: 'RUTAS', icon: 'local_shipping'}
     
   ];
 

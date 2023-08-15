@@ -1,0 +1,261 @@
+import { Component, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams } from 'ag-grid-community';
+import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
+import { Sucursal } from 'src/app/interfaces/sucursal';
+import { AgGridAngular } from 'ag-grid-angular';
+import { GridApi } from 'ag-grid-community';
+import * as XLSX from 'xlsx';
+import { Transportista } from 'src/app/interfaces/transportista';
+import { Vehiculo } from 'src/app/interfaces/vehiculo';
+import { TipoRuta } from 'src/app/interfaces/tipoRuta';
+import { Tim } from 'src/app/interfaces/tim';
+import { Ruta } from 'src/app/interfaces/ruta';
+import { RutaService } from 'src/app/services/ruta.service';
+import { SucursalService } from 'src/app/services/sucursal.service';
+import { TransportistaService } from 'src/app/services/transportista.service';
+import { VehiculoService } from 'src/app/services/vehiculo.service';
+import { TipoRutaService } from 'src/app/services/tipo-ruta.service';
+import { TipoTimService } from 'src/app/services/tipo-tim.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalRutasComponent } from './modal-rutas/modal-rutas.component';
+
+export interface DialogMant {
+  valueMant: string;
+  viewValueMant: string;
+}
+
+@Component({
+  selector: 'app-rutas',
+  templateUrl: './rutas.component.html',
+  styleUrls: ['./rutas.component.scss']
+})
+export class RutasComponent {
+  //dato modal
+  selectedDato: any;
+  //traemos los datos para la tabla
+  chofer: Transportista[] = [];
+  ayudante: Transportista[] = [];
+  sucursales: Sucursal[] = [];
+  patente: Vehiculo[] = [];
+  tipoRuta: TipoRuta[] = [];
+  tim: Tim[] = [];
+
+  onCellClicked($event: CellClickedEvent<any, any>) {
+
+  }
+
+  private gridColumnApi!: ColumnApi;
+  private gridApi!: GridApi;
+
+  columnDefs = [
+    { field: 'id', hide: true },
+    {
+      field: 'id_sucursal',
+      headerName: 'Sucursal',
+      valueGetter: (params: { data: { id_sucursal: number; }; }) => {
+        const sucursal = this.sucursales.find(s => s.id === params.data.id_sucursal);
+        return sucursal ? sucursal.nombre_sucursal : '';
+      }
+    },
+    {
+      field: 'id_chofer',
+      headerName: 'Chofer',
+      valueGetter: (params: { data: { id_chofer: number; }; }) => {
+        const chofer = this.chofer.find(c => c.id === params.data.id_chofer);
+        return chofer ? chofer.nombres + ' ' + chofer.apellidos : '';
+      }
+    },
+    {
+      field: 'id_ayudante',
+      headerName: 'Ayudante',
+      valueGetter: (params: { data: { id_ayudante: number; }; }) => {
+        const ayudante = this.ayudante.find(a => a.id === params.data.id_ayudante);
+        return ayudante ? ayudante.nombres + ' ' + ayudante.apellidos : '';
+      }
+    },
+    {
+      field: 'id_vehiculo',
+      headerName: 'Patente',
+      valueGetter: (params: { data: { id_vehiculo: number; }; }) => {
+        const patenteVeh = this.patente.find(v => v.id === params.data.id_vehiculo);
+        return patenteVeh ? patenteVeh.patente : '';
+      }
+    },
+    {
+      field: 'id_tipoRuta',
+      headerName: 'Tipo Ruta',
+      valueGetter: (params: { data: { id_tipoRuta: number; }; }) => {
+        const tpRuta = this.tipoRuta.find(tR => tR.id === params.data.id_tipoRuta);
+        return tpRuta ? tpRuta.nombre_ruta : '';
+      }
+    },
+    {
+      field: 'id_tim',
+      headerName: 'Tipo Tim',
+      valueGetter: (params: { data: { id_tim: number; }; }) => {
+        const tpTim = this.tim.find(tM => tM.id === params.data.id_tim);
+        return tpTim ? tpTim.nombreTim : '';
+      }
+    },
+
+    {
+      headerName: "Acciones",
+      field: "actions",
+      cellRenderer: (params: ICellRendererParams) => '<button class="btn btn-danger btn-sm">Eliminar</button>',
+      onCellClicked: (params: CellClickedEvent) => this.deleteRow(params.data),
+      width: 150,
+      filter: false,
+      sortable: false
+    }
+
+  ];
+
+  public defaultColDef: ColDef = {
+    sortable: true,
+    filter: true,
+  };
+
+  public rowData$!: Ruta[];
+
+  // For accessing the Grid's API
+  @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
+
+  constructor(
+    private router: Router,
+    private _RutaService: RutaService,
+    private _SucursalService: SucursalService,
+    private _TransportistaService: TransportistaService,
+    private _VehiculoService: VehiculoService,
+    private _TipoRutaService: TipoRutaService,
+    private _TipoTimService: TipoTimService,
+    private _agGridService: AgGridService,
+    private _snackBar: MatSnackBar,
+    public dialog: MatDialog
+  ) { }
+
+  ngOnInit(): void {
+    //se reciben los datos para buscar los id
+    this._SucursalService.getSucursal().subscribe(s => {
+      this.sucursales = s;
+    });
+
+    this._TransportistaService.getTransportista().subscribe(s => {
+      this.chofer = s;
+    });
+
+    this._TransportistaService.getTransportista().subscribe(s => {
+      this.ayudante = s;
+    });
+
+    this._VehiculoService.getVehiculo().subscribe(p => {
+      this.patente = p;
+    });
+
+    this._TipoRutaService.getTipoRuta().subscribe(tR => {
+      this.tipoRuta = tR;
+    });
+
+    this._TipoTimService.getTim().subscribe(tM => {
+      this.tim = tM;
+    });
+  }
+
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+
+    this.getRutas();
+    this._agGridService.autoSizeAll(this.gridColumnApi, false);
+  }
+
+
+  getRutas() {
+    this._RutaService.getRuta().subscribe({
+      next: data => {
+        this.rowData$ = data;
+        console.log("Data received", data);
+      },
+      error: error => {
+        console.error('Ocurrió un error:', error);
+        if (error.status === 400) {
+          this.logOut();
+        }
+      },
+      complete: () => {
+        console.log('Data loading complete');
+      }
+    });
+  }
+
+  onAddRuta(): void {
+    // Código existente para abrir el diálogo.
+    const dialogRef = this.dialog.open(ModalRutasComponent, {
+      // width: '60%',
+      // height: '80%',
+      data: this.selectedDato
+    });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   console.log('The dialog was closed', result);
+    // }); POR SI HAY QUE ENVIAR ALGO EN UN FUTURO
+  }
+
+  deleteRow(data: any) {
+    const dataToSend = [{ id: data.id }];
+    
+    let snackBarRef = this._snackBar.open('¿Está seguro de que desea eliminar este registro?', 'Eliminar', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+    });
+  
+    snackBarRef.onAction().subscribe(() => {
+      // Si el usuario hace clic en 'Eliminar', procede a eliminar el registro
+      this._RutaService.destroyRuta(dataToSend).subscribe({
+        next: (deletedData) => {
+          console.log('Registro eliminado:', deletedData);
+          this._snackBar.open('Registro eliminado', '', {
+            duration: 2000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+          // Refrescar la tabla
+          this.getRutas();
+        },
+        error: (error) => {
+          console.error('Ocurrió un error al eliminar:', error);
+        }
+      });
+    });
+  }
+
+  logOut() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login'])
+  }
+
+  setFilter(searchText: string) {
+    this._agGridService.quickSearch(this.agGrid, searchText);
+  }
+
+  onExportClick() {
+    // Obtener las filas filtradas
+    const filteredRows: any[] = [];
+    this.gridApi.forEachNodeAfterFilter((node) => {
+      filteredRows.push(node.data);
+    });
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredRows);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Guardar archivo
+    XLSX.writeFile(wb, 'rutas.xlsx');
+  }
+
+  mantenedores: DialogMant[] = [
+    {valueMant: 'agregarRuta-0', viewValueMant: 'AGREGAR RUTA'},
+  ];
+}

@@ -34,6 +34,11 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatTabsModule } from "@angular/material/tabs";
 import {AgGridModule} from "ag-grid-angular";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {FormControl} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
+import {NgFor, AsyncPipe} from '@angular/common';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
 // Third Party Imports
 import { ToastrModule } from 'ngx-toastr';
@@ -78,7 +83,14 @@ import { ToastrModule } from 'ngx-toastr';
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }), // ToastrModule added
-    AgGridModule
+    AgGridModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    NgFor,
+    AsyncPipe
     
   ],
   exports: [

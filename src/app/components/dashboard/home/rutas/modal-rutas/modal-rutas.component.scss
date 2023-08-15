@@ -1,0 +1,9 @@
+.button-container, .dense-2 {
+    width: 100%;
+}
+
+mat-form-field {
+    display: block;  // Asegura que cada campo ocupe toda la línea
+    width: 100%;
+    margin-bottom: 20px;  // Espaciado entre campos
+}

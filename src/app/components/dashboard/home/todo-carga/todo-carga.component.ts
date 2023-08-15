@@ -85,7 +85,6 @@ export class TodoCargaComponent {
   ) { }
 
   ngOnInit(): void {
-    this.getGuias();
 
     //se reciben los datos para buscar los id
     this._TiendaService.getTienda().subscribe(t => {
