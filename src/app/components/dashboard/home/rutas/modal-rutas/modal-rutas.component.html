@@ -1,78 +1,80 @@
 <div class="grid-col-1">
   <div class="grid-item">
-    <!-- <h1 style="padding-left: 10px; margin: 0 !important">Listado Sucursales</h1> -->
     <mat-card>
       <mat-card-content class="container">
         <div class="button-container" fxLayout="column" fxLayoutGap="10px">
-
           <div class="dense-2">
+            <!-- Sucursal -->
             <mat-form-field appearance="outline">
               <mat-label>Sucursal</mat-label>
               <input type="text" matInput [formControl]="sucursalControl" [matAutocomplete]="autoSucursal">
-              <mat-autocomplete #autoSucursal="matAutocomplete" [displayWith]="displaySucursalFn">
+              <mat-autocomplete #autoSucursal="matAutocomplete" [displayWith]="displaySucursal">
                 <mat-option *ngFor="let sucursalItem of filteredSucursales | async" [value]="sucursalItem">
                   {{ sucursalItem.nombre_sucursal }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
 
+            <!-- Chofer -->
             <mat-form-field appearance="outline">
               <mat-label>Chofer</mat-label>
               <input type="text" matInput [formControl]="choferControl" [matAutocomplete]="autoChofer">
-              <mat-autocomplete #autoChofer="matAutocomplete" [displayWith]="displayTransportistaCFn">
-                <mat-option *ngFor="let choferItem of filteredTransportista | async" [value]="choferItem">
+              <mat-autocomplete #autoChofer="matAutocomplete" [displayWith]="displayChofer">
+                <mat-option *ngFor="let choferItem of filteredChofer | async" [value]="choferItem">
                   {{ choferItem.nombres +' '+ choferItem.apellidos }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
 
+            <!-- Ayudante -->
             <mat-form-field appearance="outline">
               <mat-label>Ayudante</mat-label>
               <input type="text" matInput [formControl]="ayudanteControl" [matAutocomplete]="autoAyudante">
-              <mat-autocomplete #autoAyudante="matAutocomplete" [displayWith]="displayTransportistaAFn">
-                <mat-option *ngFor="let ayudanteItem of filteredTransportista | async" [value]="ayudanteItem">
+              <mat-autocomplete #autoAyudante="matAutocomplete" [displayWith]="displayAyudante">
+                <mat-option *ngFor="let ayudanteItem of filteredAyudante | async" [value]="ayudanteItem">
                   {{ ayudanteItem.nombres +' '+ ayudanteItem.apellidos }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
 
+            <!-- Patente -->
             <mat-form-field appearance="outline">
               <mat-label>Patente</mat-label>
               <input type="text" matInput [formControl]="patenteControl" [matAutocomplete]="autoPatente">
-              <mat-autocomplete #autoPatente="matAutocomplete" [displayWith]="displayPatenteFn">
+              <mat-autocomplete #autoPatente="matAutocomplete" [displayWith]="displayPatente">
                 <mat-option *ngFor="let patenteItem of filteredVehiculo | async" [value]="patenteItem">
                   {{ patenteItem.patente }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
 
+            <!-- Tipo Ruta -->
             <mat-form-field appearance="outline">
               <mat-label>Tipo Ruta</mat-label>
               <input type="text" matInput [formControl]="tipoRutaControl" [matAutocomplete]="autoTipoRuta">
-              <mat-autocomplete #autoTipoRuta="matAutocomplete" [displayWith]="displayTipoRutaFn">
+              <mat-autocomplete #autoTipoRuta="matAutocomplete" [displayWith]="displayTipoRuta">
                 <mat-option *ngFor="let tipoRutaItem of filteredTipoRuta | async" [value]="tipoRutaItem">
                   {{ tipoRutaItem.nombre_ruta }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
 
-            <mat-form-field class="mb-20" appearance="outline">
+            <!-- Tim -->
+            <mat-form-field appearance="outline">
               <mat-label>Tim</mat-label>
-              <mat-select [(ngModel)]="newRuta[0].id_tim">
-                <mat-option *ngFor="let tipoTim of tim" [value]="tipoTim.id">
-                  {{ tipoTim.nombreTim }}
+              <input type="text" matInput [formControl]="timControl" [matAutocomplete]="autoTim">
+              <mat-autocomplete #autoTim="matAutocomplete" [displayWith]="displayTim">
+                <mat-option *ngFor="let timItem of filteredTim | async" [value]="timItem">
+                  {{ timItem.nombreTim }}
                 </mat-option>
-              </mat-select>
+              </mat-autocomplete>
             </mat-form-field>
 
+            <!-- Botón Agregar -->
             <button mat-raised-button color="warn" (click)="onAddClick()">Agregar</button>
           </div>
-
-
         </div>
-
       </mat-card-content>
     </mat-card>
   </div>
-
 </div>

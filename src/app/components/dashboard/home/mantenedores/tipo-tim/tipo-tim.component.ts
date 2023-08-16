@@ -126,7 +126,7 @@ export class TipoTimComponent {
   }
 
   deleteRow(data: any) {
-    const dataToSend = [{ id: data.id }];
+    const dataToSend = [{ id: data.id, nombreTim: data.nombre }];
     
     let snackBarRef = this._snackBar.open('¿Está seguro de que desea eliminar este registro?', 'Eliminar', {
       duration: 5000,

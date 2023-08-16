@@ -1,8 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { NgFor, AsyncPipe } from '@angular/common';
 import { Sucursal } from 'src/app/interfaces/sucursal';
 import { Transportista } from 'src/app/interfaces/transportista';
 import { Vehiculo } from 'src/app/interfaces/vehiculo';
@@ -32,13 +31,14 @@ export class ModalRutasComponent {
   patenteControl = new FormControl();
   tipoRutaControl = new FormControl();
   timControl = new FormControl();
+
   filteredSucursales!: Observable<Sucursal[]>;
-  filteredTransportista!: Observable<Transportista[]>;
+  filteredChofer!: Observable<Transportista[]>;
+  filteredAyudante!: Observable<Transportista[]>;
   filteredVehiculo!: Observable<Vehiculo[]>;
   filteredTipoRuta!: Observable<TipoRuta[]>;
   filteredTim!: Observable<Tim[]>;
 
-  // Propiedades
   sucursal: Sucursal[] = [];
   tipoTransporte: TipoTransporte[] = [];
   chofer: Transportista[] = [];
@@ -46,9 +46,7 @@ export class ModalRutasComponent {
   patente: Vehiculo[] = [];
   nombreRuta: TipoRuta[] = [];
   tim: Tim[] = [];
-  newRuta: Ruta[] = [{
-
-  }];
+  newRuta: Ruta[] = [{}];
 
   constructor(
     public dialogRef: MatDialogRef<ModalRutasComponent>,
@@ -57,126 +55,186 @@ export class ModalRutasComponent {
     private _TransportistaService: TransportistaService,
     private _VehiculoService: VehiculoService,
     private _TipoRutaService: TipoRutaService,
-    private _TipoTimService: TipoTimService
+    private _TipoTimService: TipoTimService,
+    private _RutaService: RutaService,
+    private _snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
-    //se reciben los datos para buscar los id
-    this._SucursalService.getSucursal().subscribe(s => {
-      this.sucursal = s;
+    forkJoin({
+      sucursal: this._SucursalService.getSucursal(),
+      transportista: this._TransportistaService.getTransportista(),
+      vehiculo: this._VehiculoService.getVehiculo(),
+      tipoRuta: this._TipoRutaService.getTipoRuta(),
+      tim: this._TipoTimService.getTim()
+    }).subscribe(res => {
+      this.sucursal = res.sucursal;
+      this.chofer = res.transportista;
+      this.ayudante = res.transportista;
+      this.patente = res.vehiculo;
+      this.nombreRuta = res.tipoRuta;
+      this.tim = res.tim;
+
+      this.setupFilters();
     });
-
-    this._TransportistaService.getTransportista().subscribe(s => {
-      this.chofer = s;
-    });
-
-    this._TransportistaService.getTransportista().subscribe(s => {
-      this.ayudante = s;
-    });
-
-    this._VehiculoService.getVehiculo().subscribe(p => {
-      this.patente = p;
-    });
-
-    this._TipoRutaService.getTipoRuta().subscribe(tR => {
-      this.nombreRuta = tR;
-    });
-
-    this._TipoTimService.getTim().subscribe(tM => {
-      this.tim = tM;
-    });
-
-    // Configuración para el filtrado de sucursales
-    this.filteredSucursales = this.sucursalControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.nombre_sucursal),
-        map(name => name ? this._filterSucursal(name) : this.sucursal.slice())
-      );
-
-    this.filteredTransportista = this.choferControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.nombres + ' ' + value.apellidos),
-        map(name => name ? this._filterChofer(name) : this.chofer.slice())
-      );
-
-    this.filteredTransportista = this.ayudanteControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.nombres + ' ' + value.apellidos),
-        map(name => name ? this._filterAyudante(name) : this.ayudante.slice())
-      );
-
-    this.filteredVehiculo = this.patenteControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.patente),
-        map(name => name ? this._filterPatente(name) : this.patente.slice())
-      );
-
-    this.filteredTipoRuta = this.tipoRutaControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.nombreRuta),
-        map(name => name ? this._filterTipoRuta(name) : this.nombreRuta.slice())
-      );
   }
 
-  // Método para filtrar sucursales
-  private _filterSucursal(name: string): Sucursal[] {
-    const filterValue = name.toLowerCase();
-    return this.sucursal.filter(sucursal => sucursal.nombre_sucursal.toLowerCase().includes(filterValue));
+  setupFilters(): void {
+    this.setupSucursalFilter();
+    this.setupChoferFilter();
+    this.setupAyudanteFilter();
+    this.setupPatenteFilter();
+    this.setupTipoRutaFilter();
+    this.setupTimFilter();
   }
-
-  private _filterChofer(name: string): Transportista[] {
-    const filterValue = name.toLowerCase();
-    return this.chofer.filter(transportista =>
-      (transportista.nombres.toLowerCase() + ' ' + transportista.apellidos.toLowerCase()).includes(filterValue)
+  // Filtro para Sucursal
+  setupSucursalFilter(): void {
+    this.filteredSucursales = this.sucursalControl.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : this.displaySucursal(value)),
+      map(name => name ? this.filterSucursal(name) : this.sucursal.slice())
     );
   }
 
-  private _filterAyudante(name: string): Transportista[] {
+  filterSucursal(name: string): Sucursal[] {
     const filterValue = name.toLowerCase();
-    return this.ayudante.filter(transportista =>
-      (transportista.nombres.toLowerCase() + ' ' + transportista.apellidos.toLowerCase()).includes(filterValue)
+    return this.sucursal.filter(s => s.nombre_sucursal.toLowerCase().includes(filterValue));
+  }
+
+  displaySucursal(sucursal: Sucursal): string {
+    return sucursal ? sucursal.nombre_sucursal : '';
+  }
+
+  // Filtro para Chofer
+  setupChoferFilter(): void {
+    this.filteredChofer = this.choferControl.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : this.displayChofer(value)),
+      map(name => name ? this.filterChofer(name) : this.chofer.slice())
     );
   }
 
-  private _filterPatente(name: string): Vehiculo[] {
+  filterChofer(name: string): Transportista[] {
     const filterValue = name.toLowerCase();
-    return this.patente.filter(vehiculo => vehiculo.patente.toLowerCase().includes(filterValue));
+    return this.chofer.filter(ch => (ch.nombres + ' ' + ch.apellidos).toLowerCase().includes(filterValue));
   }
 
-  private _filterTipoRuta(name: string): TipoRuta[] {
+  displayChofer(chofer: Transportista): string {
+    return chofer ? chofer.nombres + ' ' + chofer.apellidos : '';
+  }
+
+  // Filtro para Ayudante
+  setupAyudanteFilter(): void {
+    this.filteredAyudante = this.ayudanteControl.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : this.displayAyudante(value)),
+      map(name => name ? this.filterAyudante(name) : this.ayudante.slice())
+    );
+  }
+
+  filterAyudante(name: string): Transportista[] {
     const filterValue = name.toLowerCase();
-    return this.nombreRuta.filter(nombreRuta => nombreRuta.nombre_ruta.toLowerCase().includes(filterValue));
+    return this.ayudante.filter(ay => (ay.nombres + ' ' + ay.apellidos).toLowerCase().includes(filterValue));
   }
 
-  // Método para mostrar el nombre de la sucursal en el input
-  displaySucursalFn(sucursal: Sucursal): string {
-    return sucursal?.nombre_sucursal || '';
+  displayAyudante(ayudante: Transportista): string {
+    return ayudante ? ayudante.nombres + ' ' + ayudante.apellidos : '';
   }
 
-  displayTransportistaCFn(transportista: Transportista): string {
-    return transportista ? transportista.nombres + ' ' + transportista.apellidos : '';
+  // Filtro para Patente
+  setupPatenteFilter(): void {
+    this.filteredVehiculo = this.patenteControl.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : this.displayPatente(value)),
+      map(name => name ? this.filterPatente(name) : this.patente.slice())
+    );
   }
 
-  displayTransportistaAFn(transportista: Transportista): string {
-    return transportista ? transportista.nombres + ' ' + transportista.apellidos : '';
+  filterPatente(name: string): Vehiculo[] {
+    const filterValue = name.toLowerCase();
+    return this.patente.filter(pt => pt.patente.toLowerCase().includes(filterValue));
   }
 
-  displayPatenteFn(patente: Vehiculo): string {
-    return patente?.patente || '';
+  displayPatente(patente: Vehiculo): string {
+    return patente ? patente.patente : '';
   }
 
-  displayTipoRutaFn(nombreRuta: TipoRuta): string {
-    return nombreRuta?.nombre_ruta || '';
+  // Filtro para Tipo Ruta
+  setupTipoRutaFilter(): void {
+    this.filteredTipoRuta = this.tipoRutaControl.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : this.displayTipoRuta(value)),
+      map(name => name ? this.filterTipoRuta(name) : this.nombreRuta.slice())
+    );
   }
 
+  filterTipoRuta(name: string): TipoRuta[] {
+    const filterValue = name.toLowerCase();
+    return this.nombreRuta.filter(tr => tr.nombre_ruta.toLowerCase().includes(filterValue));
+  }
 
-  onAddClick() {
+  displayTipoRuta(tipoRuta: TipoRuta): string {
+    return tipoRuta ? tipoRuta.nombre_ruta : '';
+  }
 
+  // Filtro para Tim
+  setupTimFilter(): void {
+    this.filteredTim = this.timControl.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : this.displayTim(value)),
+      map(name => name ? this.filterTim(name) : this.tim.slice())
+    );
+  }
+
+  filterTim(name: string): Tim[] {
+    const filterValue = name.toLowerCase();
+    return this.tim.filter(t => t.nombreTim.toLowerCase().includes(filterValue));
+  }
+
+  displayTim(tim: Tim): string {
+    return tim ? tim.nombreTim : '';
+  }
+
+  onAddClick(): void {
+    const preparedRuta = this.getRutaArray(); // Obtiene el objeto de ruta preparado
+  console.log('ruta?',preparedRuta)
+    this._RutaService.insertRuta(preparedRuta).subscribe({
+      next: (ruta) => {
+        console.log('Ruta agregada:', ruta);
+        this._snackBar.open('Ruta Agregada', '', {
+          duration: 2000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        // Si el backend responde con una ruta, la agregas al array de rutas
+        if (Array.isArray(ruta)) {
+          this.newRuta.push(...ruta);
+          // Supongo que querrás actualizar alguna lista o realizar alguna otra operación similar a getGuias();
+        } else {
+          this.newRuta.push(ruta);
+        }
+      },
+      error: (error) => {
+        console.error('Ocurrió un error:', error);
+        // Maneja el error según tus necesidades (e.g., muestra una notificación al usuario)
+      },
+      complete: () => {
+        console.log('Operación de inserción completa.');
+      }
+    });
+  }
+  
+  getRutaArray(): any[] {
+    let rutaObject = {
+      "id_sucursal": this.sucursalControl.value.id,
+      "id_chofer": this.choferControl.value.id,
+      "id_ayudante": this.ayudanteControl.value.id,
+      "id_vehiculo": this.patenteControl.value.id,
+      "id_tipoRuta": this.tipoRutaControl.value.id,
+      "id_tim": this.timControl.value.id
+    };
+
+    return [rutaObject];
   }
 
   onNoClick(): void {
