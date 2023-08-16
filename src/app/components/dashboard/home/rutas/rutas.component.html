@@ -19,15 +19,13 @@
               <hr>
               <!--[rowData]="rowData$ | async""  es para indicar que es un observable-->
                   <ag-grid-angular
-                      style="width: 100%; height: calc(500px)"
+                      style="width: 100%; height: calc(790px)"
                       class="ag-theme-alpine"
                       [columnDefs]="columnDefs"
                       [defaultColDef]="defaultColDef"
                       [rowData]="rowData$"
-                      [rowSelection]="'multiple'"
                       [animateRows]="true"
                       (gridReady)="onGridReady($event)"
-                      (cellClicked)="onCellClicked($event)"
                   ></ag-grid-angular>
                   
           </mat-card-content>

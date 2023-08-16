@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams } from 'ag-grid-community';
+import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams, Column } from 'ag-grid-community';
 import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
 import { Sucursal } from 'src/app/interfaces/sucursal';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -42,9 +42,6 @@ export class RutasComponent {
   tipoRuta: TipoRuta[] = [];
   tim: Tim[] = [];
 
-  onCellClicked($event: CellClickedEvent<any, any>) {
-
-  }
 
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
@@ -103,12 +100,27 @@ export class RutasComponent {
     {
       headerName: "Acciones",
       field: "actions",
-      cellRenderer: (params: ICellRendererParams) => '<button class="btn btn-danger btn-sm">Eliminar</button>',
-      onCellClicked: (params: CellClickedEvent) => this.deleteRow(params.data),
-      width: 150,
-      filter: false,
-      sortable: false
+      cellRenderer: (params: ICellRendererParams) => `
+      <div class="btn-group action" role="group">
+      <button class='btn btn-lt btn-outline-warning botonverruta' data-toggle="tooltip" data-placement="top" title="Ingresar guías"><i class="fa fa-file-text-o fa-fw" aria-hidden="true"></i></button>
+      <button class='btn btn-lt btn-outline-primary botonmodificarruta' data-toggle="tooltip" data-placement="top" title="Modificar ruta"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i></button>
+      <button class='btn btn-lt btn-outline-danger botonBorrarRuta' data-toggle="tooltip" data-placement="top" title="Borrar ruta"><i class="fa fa-trash-o fa-fw" aria-hidden="true"></i></button>
+      </div>
+      `,
+      onCellClicked: (params: CellClickedEvent) => {
+        if (params.event && params.event.target) {
+          const targetElement = params.event.target as HTMLElement;
+
+          if (targetElement.classList.contains('botonBorrarRuta')) {
+            this.deleteRow(params.data);
+          }
+          // Añade más lógica aquí para otros botones si es necesario
+        }
+      },
+
     }
+
+
 
   ];
 
@@ -134,6 +146,33 @@ export class RutasComponent {
     private _snackBar: MatSnackBar,
     public dialog: MatDialog
   ) { }
+
+  adjustColumnsToPercentage(percentage: number) {
+    if (this.gridApi && this.gridColumnApi) {
+      const gridElement = document.querySelector('.ag-theme-alpine'); // Obtener el elemento del grid
+      const totalWidth = gridElement ? gridElement.clientWidth : 0; // Obtener el ancho
+      const desiredWidth = (totalWidth * percentage) / 100;
+      const columnCount = this.gridColumnApi.getAllGridColumns().length; // Usa getAllGridColumns
+      const columnWidth = desiredWidth / columnCount;
+
+      const columnWidths: { key: string | Column; newWidth: number; }[] = [];
+      this.gridColumnApi.getAllGridColumns().forEach(column => { // Usa getAllGridColumns
+        columnWidths.push({
+          key: column.getColId(),
+          newWidth: columnWidth
+        });
+      });
+
+      this.gridColumnApi.setColumnWidths(columnWidths);
+    }
+  }
+
+  //por si hay que hacer resize este es
+  // ngAfterViewInit() {
+  //   window.addEventListener('resize', () => {
+  //     this.adjustColumnsToPercentage(90);
+  //   });
+  // }
 
   ngOnInit(): void {
     //se reciben los datos para buscar los id
@@ -167,7 +206,7 @@ export class RutasComponent {
     this.gridColumnApi = params.columnApi;
 
     this.getRutas();
-    this._agGridService.autoSizeAll(this.gridColumnApi, false);
+    this.adjustColumnsToPercentage(75);
   }
 
 
@@ -176,6 +215,7 @@ export class RutasComponent {
       next: data => {
         this.rowData$ = data;
         console.log("Data received", data);
+        this.adjustColumnsToPercentage(75);
       },
       error: error => {
         console.error('Ocurrió un error:', error);
@@ -204,13 +244,13 @@ export class RutasComponent {
 
   deleteRow(data: any) {
     const dataToSend = [{ id: data.id }];
-    
+
     let snackBarRef = this._snackBar.open('¿Está seguro de que desea eliminar este registro?', 'Eliminar', {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
     });
-  
+
     snackBarRef.onAction().subscribe(() => {
       // Si el usuario hace clic en 'Eliminar', procede a eliminar el registro
       this._RutaService.destroyRuta(dataToSend).subscribe({
@@ -256,6 +296,6 @@ export class RutasComponent {
   }
 
   mantenedores: DialogMant[] = [
-    {valueMant: 'agregarRuta-0', viewValueMant: 'AGREGAR RUTA'},
+    { valueMant: 'agregarRuta-0', viewValueMant: 'AGREGAR RUTA' },
   ];
 }

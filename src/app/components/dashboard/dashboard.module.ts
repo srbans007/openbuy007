@@ -29,6 +29,8 @@ import { RutasComponent } from './home/rutas/rutas.component';
 import { GuiasEnRutaComponent } from './home/rutas/guias-en-ruta/guias-en-ruta.component';
 import { ModalRutasComponent } from './home/rutas/modal-rutas/modal-rutas.component';
 import { ModalGuiasRutaComponent } from './home/rutas/modal-guias-ruta/modal-guias-ruta.component';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @NgModule({
@@ -59,7 +61,9 @@ import { ModalGuiasRutaComponent } from './home/rutas/modal-guias-ruta/modal-gui
     SharedModule,
     MatAutocompleteModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatButtonToggleModule,
+    MatButtonModule
   ]
 })
-export class DashboardModule { }
+export class DashboardModule  { }
