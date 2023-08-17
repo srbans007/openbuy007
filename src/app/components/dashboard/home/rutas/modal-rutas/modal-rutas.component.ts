@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, EventEmitter, Inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, forkJoin } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import { TipoRutaService } from 'src/app/services/tipo-ruta.service';
 import { TipoTimService } from 'src/app/services/tipo-tim.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogMant } from '../rutas.component';
+import { DialogMant, RutasComponent } from '../rutas.component';
 import { TipoTransporte } from 'src/app/interfaces/tipoTransporte';
 
 @Component({
@@ -25,6 +25,7 @@ import { TipoTransporte } from 'src/app/interfaces/tipoTransporte';
   styleUrls: ['./modal-rutas.component.scss']
 })
 export class ModalRutasComponent {
+  public onRutaAdded: EventEmitter<void> = new EventEmitter<void>();
   sucursalControl = new FormControl();
   choferControl = new FormControl();
   ayudanteControl = new FormControl();
@@ -197,9 +198,11 @@ export class ModalRutasComponent {
 
   onAddClick(): void {
     const preparedRuta = this.getRutaArray(); // Obtiene el objeto de ruta preparado
-  console.log('ruta?',preparedRuta)
+    
     this._RutaService.insertRuta(preparedRuta).subscribe({
+      
       next: (ruta) => {
+        
         console.log('Ruta agregada:', ruta);
         this._snackBar.open('Ruta Agregada', '', {
           duration: 2000,
@@ -209,10 +212,11 @@ export class ModalRutasComponent {
         // Si el backend responde con una ruta, la agregas al array de rutas
         if (Array.isArray(ruta)) {
           this.newRuta.push(...ruta);
-          // Supongo que querrás actualizar alguna lista o realizar alguna otra operación similar a getGuias();
+
         } else {
           this.newRuta.push(ruta);
         }
+        this.onRutaAdded.emit();
       },
       error: (error) => {
         console.error('Ocurrió un error:', error);

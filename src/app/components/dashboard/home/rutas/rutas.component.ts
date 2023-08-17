@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams, Column } from 'ag-grid-community';
-import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
+import { AgGridService } from 'src/app/services/ag-grid.service'; 
 import { Sucursal } from 'src/app/interfaces/sucursal';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi } from 'ag-grid-community';
@@ -41,7 +41,6 @@ export class RutasComponent {
   patente: Vehiculo[] = [];
   tipoRuta: TipoRuta[] = [];
   tim: Tim[] = [];
-
 
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
@@ -101,10 +100,10 @@ export class RutasComponent {
       headerName: "Acciones",
       field: "actions",
       cellRenderer: (params: ICellRendererParams) => `
-      <div class="btn-group action" role="group">
-      <button class='btn btn-lt btn-outline-warning botonverruta' data-toggle="tooltip" data-placement="top" title="Ingresar guías"><i class="fa fa-file-text-o fa-fw" aria-hidden="true"></i></button>
-      <button class='btn btn-lt btn-outline-primary botonmodificarruta' data-toggle="tooltip" data-placement="top" title="Modificar ruta"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i></button>
-      <button class='btn btn-lt btn-outline-danger botonBorrarRuta' data-toggle="tooltip" data-placement="top" title="Borrar ruta"><i class="fa fa-trash-o fa-fw" aria-hidden="true"></i></button>
+      <div class="btn-group" role="group">
+        <button class='btn btn-lt btn-outline-warning botonverruta' data-toggle="tooltip" data-placement="top" title="Ingresar guías"><i class="fa fa-file-text-o fa-fw" aria-hidden="true"></i></button>
+        <button class='btn btn-lt btn-outline-primary botonmodificarruta' data-toggle="tooltip" data-placement="top" title="Modificar ruta"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i></button>
+        <button class='btn btn-lt btn-outline-danger botonBorrarRuta' data-toggle="tooltip" data-placement="top" title="Borrar ruta"><i class="fa fa-trash-o fa-fw" aria-hidden="true"></i></button>
       </div>
       `,
       onCellClicked: (params: CellClickedEvent) => {
@@ -117,6 +116,7 @@ export class RutasComponent {
           // Añade más lógica aquí para otros botones si es necesario
         }
       },
+      width: 190
 
     }
 
@@ -124,9 +124,15 @@ export class RutasComponent {
 
   ];
 
+  public gridOptions = {
+    rowHeight: 50, // Ajusta esto según tus necesidades
+    // otras opciones...
+  };
+
   public defaultColDef: ColDef = {
     sortable: true,
     filter: true,
+    resizable: false
   };
 
   public rowData$!: Ruta[];
@@ -147,25 +153,6 @@ export class RutasComponent {
     public dialog: MatDialog
   ) { }
 
-  adjustColumnsToPercentage(percentage: number) {
-    if (this.gridApi && this.gridColumnApi) {
-      const gridElement = document.querySelector('.ag-theme-alpine'); // Obtener el elemento del grid
-      const totalWidth = gridElement ? gridElement.clientWidth : 0; // Obtener el ancho
-      const desiredWidth = (totalWidth * percentage) / 100;
-      const columnCount = this.gridColumnApi.getAllGridColumns().length; // Usa getAllGridColumns
-      const columnWidth = desiredWidth / columnCount;
-
-      const columnWidths: { key: string | Column; newWidth: number; }[] = [];
-      this.gridColumnApi.getAllGridColumns().forEach(column => { // Usa getAllGridColumns
-        columnWidths.push({
-          key: column.getColId(),
-          newWidth: columnWidth
-        });
-      });
-
-      this.gridColumnApi.setColumnWidths(columnWidths);
-    }
-  }
 
   //por si hay que hacer resize este es
   // ngAfterViewInit() {
@@ -199,23 +186,22 @@ export class RutasComponent {
     this._TipoTimService.getTim().subscribe(tM => {
       this.tim = tM;
     });
+    
+    this.getRutas();
   }
+
+  
 
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
-
     this.getRutas();
-    this.adjustColumnsToPercentage(75);
   }
-
 
   getRutas() {
     this._RutaService.getRuta().subscribe({
       next: data => {
         this.rowData$ = data;
-        console.log("Data received", data);
-        this.adjustColumnsToPercentage(75);
       },
       error: error => {
         console.error('Ocurrió un error:', error);
@@ -230,16 +216,13 @@ export class RutasComponent {
   }
 
   onAddRuta(): void {
-    // Código existente para abrir el diálogo.
     const dialogRef = this.dialog.open(ModalRutasComponent, {
-      // width: '60%',
-      // height: '80%',
       data: this.selectedDato
     });
 
-    // dialogRef.afterClosed().subscribe(result => {
-    //   console.log('The dialog was closed', result);
-    // }); POR SI HAY QUE ENVIAR ALGO EN UN FUTURO
+    dialogRef.componentInstance.onRutaAdded.subscribe(() => {
+      this.getRutas();
+    });
   }
 
   deleteRow(data: any) {
@@ -252,7 +235,6 @@ export class RutasComponent {
     });
 
     snackBarRef.onAction().subscribe(() => {
-      // Si el usuario hace clic en 'Eliminar', procede a eliminar el registro
       this._RutaService.destroyRuta(dataToSend).subscribe({
         next: (deletedData) => {
           console.log('Registro eliminado:', deletedData);
@@ -261,7 +243,6 @@ export class RutasComponent {
             horizontalPosition: 'center',
             verticalPosition: 'top'
           });
-          // Refrescar la tabla
           this.getRutas();
         },
         error: (error) => {
@@ -281,7 +262,6 @@ export class RutasComponent {
   }
 
   onExportClick() {
-    // Obtener las filas filtradas
     const filteredRows: any[] = [];
     this.gridApi.forEachNodeAfterFilter((node) => {
       filteredRows.push(node.data);
@@ -290,8 +270,6 @@ export class RutasComponent {
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredRows);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-    // Guardar archivo
     XLSX.writeFile(wb, 'rutas.xlsx');
   }
 

@@ -123,21 +123,10 @@ html, body {
   white-space: nowrap; // Asegura que el texto no se rompa en varias líneas
 }
 
-// Establecer un ancho específico para la columna de acciones y eliminar text-overflow
-.ag-cell-value .btn-group.action {
-  width: 100%; // Ocupa todo el ancho de la celda
-  text-overflow: clip; // Quita los puntos suspensivos
-  overflow: visible; // Permite que el contenido desborde el contenedor
+.ag-theme-alpine {
+  height: 500px; /* Ajusta este valor según tus necesidades */
+  width: 100%;
 }
-
-// Si deseas quitar los puntos suspensivos solo de la columna de acciones, puedes ajustar el selector CSS para ser más específico
-.ag-cell.actions .btn-group.action {
-  text-overflow: clip;
-  overflow: visible;
-}
-
-
-
 
 //.grid-container {
 //  display: grid;
