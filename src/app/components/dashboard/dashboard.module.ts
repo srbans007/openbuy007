@@ -31,6 +31,9 @@ import { ModalRutasComponent } from './home/rutas/modal-rutas/modal-rutas.compon
 import { ModalGuiasRutaComponent } from './home/rutas/modal-guias-ruta/modal-guias-ruta.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { FlexLayoutModule } from '@angular/flex-layout';
+
 
 
 @NgModule({
@@ -63,7 +66,9 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     MatFormFieldModule,
     MatButtonToggleModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTableModule,
+    FlexLayoutModule
   ]
 })
 export class DashboardModule  { }

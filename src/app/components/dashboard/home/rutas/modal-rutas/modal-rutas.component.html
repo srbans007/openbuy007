@@ -71,9 +71,10 @@
             </mat-form-field>
 
             <!-- Botón Agregar -->
-            <button mat-raised-button color="warn" (click)="onAddClick()">Agregar</button>
+            <button *ngIf="currentAction === 'add'" mat-raised-button color="warn" (click)="onAddClick()">Agregar</button>
             <!-- Botón Modificar -->
-            <button mat-raised-button color="warn" (click)="onUpdateClick()">Modificar</button>
+            <button *ngIf="currentAction === 'edit'" mat-raised-button color="warn" (click)="onUpdateClick()">Modificar</button>
+
           </div>
         </div>
       </mat-card-content>

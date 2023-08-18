@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Inject } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { Observable, forkJoin } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { Sucursal } from 'src/app/interfaces/sucursal';
@@ -16,7 +16,6 @@ import { TipoRutaService } from 'src/app/services/tipo-ruta.service';
 import { TipoTimService } from 'src/app/services/tipo-tim.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogMant, RutasComponent } from '../rutas.component';
 import { TipoTransporte } from 'src/app/interfaces/tipoTransporte';
 
 @Component({
@@ -49,9 +48,10 @@ export class ModalRutasComponent {
   tim: Tim[] = [];
   newRuta: Ruta[] = [{}];
 
+  currentAction: 'add' | 'edit' | null = null;
+
   constructor(
     public dialogRef: MatDialogRef<ModalRutasComponent>,
-    //@Inject(MAT_DIALOG_DATA) public data: DialogMant,
     @Inject(MAT_DIALOG_DATA) public data: Ruta,
     private _SucursalService: SucursalService,
     private _TransportistaService: TransportistaService,
@@ -234,6 +234,7 @@ export class ModalRutasComponent {
   }
 
   onAddClick(): void {
+    this.currentAction = 'add';
     const preparedRuta = this.getRutaArray(); // Obtiene el objeto de ruta preparado
 
     this._RutaService.insertRuta(preparedRuta).subscribe({
@@ -266,6 +267,7 @@ export class ModalRutasComponent {
   }
 
   onUpdateClick(): void {
+    this.currentAction = 'edit';
     const updatedRuta = this.getUpdatedRuta(); // Obtiene el array con el objeto de ruta actualizado
   
     this._RutaService.updateRuta(updatedRuta).subscribe({

@@ -20,6 +20,7 @@ import { TipoTimService } from 'src/app/services/tipo-tim.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalRutasComponent } from './modal-rutas/modal-rutas.component';
+import { ModalGuiasRutaComponent } from './modal-guias-ruta/modal-guias-ruta.component';
 
 export interface DialogMant {
   valueMant: string;
@@ -101,7 +102,7 @@ export class RutasComponent {
       field: "actions",
       cellRenderer: (params: ICellRendererParams) => `
       <div class="btn-group" role="group">
-        <button class='btn btn-lt btn-outline-warning botonverruta' data-toggle="tooltip" data-placement="top" title="Ingresar guías"><i class="fa fa-file-text-o fa-fw" aria-hidden="true"></i></button>
+        <button class='btn btn-lt btn-outline-warning botonAgregarGuia' data-toggle="tooltip" data-placement="top" title="Ingresar guías"><i class="fa fa-file-text-o fa-fw" aria-hidden="true"></i></button>
         <button class='btn btn-lt btn-outline-primary botonmodificarruta' data-toggle="tooltip" data-placement="top" title="Modificar ruta"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i></button>
         <button class='btn btn-lt btn-outline-danger botonBorrarRuta' data-toggle="tooltip" data-placement="top" title="Borrar ruta"><i class="fa fa-trash-o fa-fw" aria-hidden="true"></i></button>
       </div>
@@ -116,18 +117,19 @@ export class RutasComponent {
           if (targetElement.classList.contains('botonmodificarruta')) {
             this.openEditModal(params.data);
           }
+          if (targetElement.classList.contains('botonAgregarGuia')) {
+            this.openGuiaModal(params.data);
+          }
         }
       },
       width: 190
 
     }
 
-
-
   ];
 
   public gridOptions = {
-    rowHeight: 50, // Ajusta esto según tus necesidades
+    rowHeight: 50,
     // otras opciones...
   };
 
@@ -154,14 +156,6 @@ export class RutasComponent {
     private _snackBar: MatSnackBar,
     public dialog: MatDialog
   ) { }
-
-
-  //por si hay que hacer resize este es
-  // ngAfterViewInit() {
-  //   window.addEventListener('resize', () => {
-  //     this.adjustColumnsToPercentage(90);
-  //   });
-  // }
 
   ngOnInit(): void {
     //se reciben los datos para buscar los id
@@ -192,8 +186,6 @@ export class RutasComponent {
     this.getRutas();
   }
 
-  
-
   onGridReady(params: any) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
@@ -221,7 +213,7 @@ export class RutasComponent {
     const dialogRef = this.dialog.open(ModalRutasComponent, {
       data: this.selectedDato
     });
-
+    dialogRef.componentInstance.currentAction = 'add';
     dialogRef.componentInstance.onRutaAdded.subscribe(() => {
       this.getRutas();
     });
@@ -230,11 +222,31 @@ export class RutasComponent {
   openEditModal(data: any): void {
     const dialogRef = this.dialog.open(ModalRutasComponent, {
         data: data
-        
     });
-    console.log('wea', data)
+    dialogRef.componentInstance.currentAction = 'edit';
     dialogRef.componentInstance.onRutaAdded.subscribe(() => {
         this.getRutas();
+    });
+  }
+
+  openGuiaModal(dataGuia: any): void {
+    const selectedSucursal = this.sucursales.find(s => s.id === dataGuia.id_sucursal);
+    const selectedChofer = this.chofer.find(c => c.id === dataGuia.id_chofer);
+    const selectedAyudante = this.ayudante.find(a => a.id === dataGuia.id_ayudante);
+    const selectedPatente = this.patente.find(p => p.id === dataGuia.id_vehiculo);
+    const selectedTipoRuta = this.tipoRuta.find(tR => tR.id === dataGuia.id_tipoRuta);
+    const selectedTim = this.tim.find(tM => tM.id === dataGuia.id_tim);
+
+    const dialogRef = this.dialog.open(ModalGuiasRutaComponent, {
+      data: {
+        dataGuia: dataGuia,
+        selectedSucursal: selectedSucursal,
+        selectedChofer: selectedChofer,
+        selectedAyudante: selectedAyudante,
+        selectedPatente: selectedPatente,
+        selectedTipoRuta: selectedTipoRuta,
+        selectedTim: selectedTim
+      }
     });
   }
 

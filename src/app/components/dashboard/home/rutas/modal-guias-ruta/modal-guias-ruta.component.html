@@ -1,1 +1,81 @@
-<p>modal-guias-ruta works!</p>
+
+<div class="modal">
+    
+    <div class="modal-header">
+        <h3>Agregar Guía</h3>
+    </div>
+
+    <mat-card class="top-card inputGuia" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+        <div class="centered-content">
+            <mat-form-field appearance="fill" fxFlex="45">
+                <mat-label>Guia - Boleta - LPN</mat-label>
+                <input matInput placeholder="...">
+            </mat-form-field>
+        </div>
+    </mat-card>
+
+    <div class="modal-body" fxLayout="row" fxLayoutGap="20px">
+        <mat-card class="left-content">
+            <mat-list>
+                <mat-list-item>
+                    <span class="mat-subheading-1">Sucursal:</span>
+                    <span>{{ sucursal[0].nombre_sucursal }}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span class="mat-subheading-1">Chofer:</span>
+                    <span>{{ chofer[0].nombres + ' ' + chofer[0].apellidos }}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span class="mat-subheading-1">Ayudante:</span>
+                    <span>{{ ayudante[0].nombres + ' ' + ayudante[0].apellidos }}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span class="mat-subheading-1">Patente:</span>
+                    <span>{{ patente[0].patente }}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span class="mat-subheading-1">Ruta:</span>
+                    <span>{{ nombreRuta[0].nombre_ruta }}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span class="mat-subheading-1">TIM:</span>
+                    <span>{{ tim[0].nombreTim }}</span>
+                </mat-list-item>
+            </mat-list>
+        </mat-card>
+
+        <mat-card class="right-content">
+            <!-- Tabla ficticia -->
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+   
+                <ng-container matColumnDef="position">
+                    <th mat-header-cell *matHeaderCellDef> No. </th>
+                    <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef> No. </th>
+                    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="weight">
+                    <th mat-header-cell *matHeaderCellDef> No. </th>
+                    <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="symbol">
+                    <th mat-header-cell *matHeaderCellDef> No. </th>
+                    <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
+                </ng-container>
+    
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </mat-card>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button color="primary">Excel</button>
+        <button mat-raised-button color="warn" >Cerrar</button>
+        
+    </div>
+</div>
