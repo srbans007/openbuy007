@@ -113,7 +113,9 @@ export class RutasComponent {
           if (targetElement.classList.contains('botonBorrarRuta')) {
             this.deleteRow(params.data);
           }
-          // Añade más lógica aquí para otros botones si es necesario
+          if (targetElement.classList.contains('botonmodificarruta')) {
+            this.openEditModal(params.data);
+          }
         }
       },
       width: 190
@@ -225,6 +227,17 @@ export class RutasComponent {
     });
   }
 
+  openEditModal(data: any): void {
+    const dialogRef = this.dialog.open(ModalRutasComponent, {
+        data: data
+        
+    });
+    console.log('wea', data)
+    dialogRef.componentInstance.onRutaAdded.subscribe(() => {
+        this.getRutas();
+    });
+  }
+
   deleteRow(data: any) {
     const dataToSend = [{ id: data.id }];
 
@@ -273,7 +286,5 @@ export class RutasComponent {
     XLSX.writeFile(wb, 'rutas.xlsx');
   }
 
-  mantenedores: DialogMant[] = [
-    { valueMant: 'agregarRuta-0', viewValueMant: 'AGREGAR RUTA' },
-  ];
+  
 }

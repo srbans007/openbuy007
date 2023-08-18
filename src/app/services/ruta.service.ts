@@ -40,7 +40,7 @@ export class RutaService {
 
   updateRuta(ruta: Ruta[]): Observable<Ruta[]> {
     return this.http.post<Ruta[]>(`${this.myAppUrl}${this.update}`, ruta, { headers: this.headers });
-  }
+  } 
 
   destroyRuta(ruta: Ruta[]): Observable<Ruta[]> {
     return this.http.post<Ruta[]>(`${this.myAppUrl}${this.eliminar}`, ruta, { headers: this.headers });

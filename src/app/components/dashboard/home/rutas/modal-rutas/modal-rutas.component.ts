@@ -51,7 +51,8 @@ export class ModalRutasComponent {
 
   constructor(
     public dialogRef: MatDialogRef<ModalRutasComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogMant,
+    //@Inject(MAT_DIALOG_DATA) public data: DialogMant,
+    @Inject(MAT_DIALOG_DATA) public data: Ruta,
     private _SucursalService: SucursalService,
     private _TransportistaService: TransportistaService,
     private _VehiculoService: VehiculoService,
@@ -62,6 +63,7 @@ export class ModalRutasComponent {
   ) { }
 
   ngOnInit(): void {
+
     forkJoin({
       sucursal: this._SucursalService.getSucursal(),
       transportista: this._TransportistaService.getTransportista(),
@@ -77,6 +79,41 @@ export class ModalRutasComponent {
       this.tim = res.tim;
 
       this.setupFilters();
+      // Sucursal
+      const matchingSucursal = this.sucursal.find(s => s.id === this.data.id_sucursal);
+      if (matchingSucursal) {
+        this.sucursalControl.setValue(matchingSucursal);
+      }
+
+      // Chofer
+      const matchingChofer = this.chofer.find(c => c.id === this.data.id_chofer);
+      if (matchingChofer) {
+        this.choferControl.setValue(matchingChofer);
+      }
+
+      // Ayudante
+      const matchingAyudante = this.ayudante.find(a => a.id === this.data.id_ayudante);
+      if (matchingAyudante) {
+        this.ayudanteControl.setValue(matchingAyudante);
+      }
+
+      // Patente
+      const matchingPatente = this.patente.find(p => p.id === this.data.id_vehiculo);
+      if (matchingPatente) {
+        this.patenteControl.setValue(matchingPatente);
+      }
+
+      // Tipo Ruta
+      const matchingTipoRuta = this.nombreRuta.find(tR => tR.id === this.data.id_tipoRuta);
+      if (matchingTipoRuta) {
+        this.tipoRutaControl.setValue(matchingTipoRuta);
+      }
+
+      // Tim
+      const matchingTim = this.tim.find(tM => tM.id === this.data.id_tim);
+      if (matchingTim) {
+        this.timControl.setValue(matchingTim);
+      }
     });
   }
 
@@ -198,11 +235,11 @@ export class ModalRutasComponent {
 
   onAddClick(): void {
     const preparedRuta = this.getRutaArray(); // Obtiene el objeto de ruta preparado
-    
+
     this._RutaService.insertRuta(preparedRuta).subscribe({
-      
+
       next: (ruta) => {
-        
+
         console.log('Ruta agregada:', ruta);
         this._snackBar.open('Ruta Agregada', '', {
           duration: 2000,
@@ -226,6 +263,43 @@ export class ModalRutasComponent {
         console.log('Operación de inserción completa.');
       }
     });
+  }
+
+  onUpdateClick(): void {
+    const updatedRuta = this.getUpdatedRuta(); // Obtiene el array con el objeto de ruta actualizado
+  
+    this._RutaService.updateRuta(updatedRuta).subscribe({
+      next: (rutas) => {
+        console.log('Ruta actualizada:', rutas);
+        this._snackBar.open('Ruta Actualizada', '', {
+          duration: 2000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        this.onRutaAdded.emit(); // Si necesitas refrescar la lista después de una actualización
+      },
+      error: (error) => {
+        console.error('Ocurrió un error:', error);
+        // Maneja el error según tus necesidades (e.g., muestra una notificación al usuario)
+      },
+      complete: () => {
+        console.log('Operación de actualización completa.');
+      }
+    });
+  }
+
+  getUpdatedRuta(): any[] {
+    let rutaObject = {
+      "id": this.data.id,
+      "id_sucursal": this.sucursalControl.value.id,
+      "id_chofer": this.choferControl.value.id,
+      "id_ayudante": this.ayudanteControl.value.id,
+      "id_vehiculo": this.patenteControl.value.id,
+      "id_tipoRuta": this.tipoRutaControl.value.id,
+      "id_tim": this.timControl.value.id
+    };
+
+    return [rutaObject];
   }
   
   getRutaArray(): any[] {
