@@ -38,8 +38,7 @@
   box-shadow: none; // Remueve la sombra ya que estamos en un modal con su propia sombra
 }
 
-.left-content,
-.right-content {
+.left-content {
   padding: 16px;
   border: 1px solid #e0e0e0;
 }
@@ -83,7 +82,7 @@
     flex-direction: column !important; // Cambia la dirección a vertical
   }
 
-  .modal-body .mat-card .left-content .right-content {
+  .modal-body .mat-card .left-content{
     width: 100% !important; // Establece el ancho al 100% para las tarjetas
     box-sizing: border-box !important; // Asegura que padding y border se incluyan en el ancho total
     overflow-x: auto !important; // Permite el desplazamiento horizontal si es necesario

@@ -96,6 +96,7 @@ export class RutasComponent {
         return tpTim ? tpTim.nombreTim : '';
       }
     },
+    { field: 'createdAt', headerName: 'Fecha Creación' },
 
     {
       headerName: "Acciones",
@@ -111,13 +112,15 @@ export class RutasComponent {
         if (params.event && params.event.target) {
           const targetElement = params.event.target as HTMLElement;
 
-          if (targetElement.classList.contains('botonBorrarRuta')) {
-            this.deleteRow(params.data);
+          // Busca el botón más cercano desde el ícono
+          const closestButton = targetElement.closest('button');
+          if (closestButton && closestButton.classList.contains('botonBorrarRuta')) {
+              this.deleteRow(params.data);
           }
-          if (targetElement.classList.contains('botonmodificarruta')) {
+          if (closestButton && closestButton.classList.contains('botonmodificarruta')) {
             this.openEditModal(params.data);
           }
-          if (targetElement.classList.contains('botonAgregarGuia')) {
+          if (closestButton && closestButton.classList.contains('botonAgregarGuia')) {
             this.openGuiaModal(params.data);
           }
         }
@@ -211,7 +214,7 @@ export class RutasComponent {
 
   onAddRuta(): void {
     const dialogRef = this.dialog.open(ModalRutasComponent, {
-      data: this.selectedDato
+      data: {}  // se pasa vacio, ya que es una adición y no una edición.
     });
     dialogRef.componentInstance.currentAction = 'add';
     dialogRef.componentInstance.onRutaAdded.subscribe(() => {
