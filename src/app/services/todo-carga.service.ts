@@ -1,9 +1,10 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Todo_carga } from '../interfaces/todo-carga';
 import { SeguimientoService } from '../services/seguimiento.service';
+import { GuiaRuta } from '../interfaces/guiaRuta';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,8 @@ import { SeguimientoService } from '../services/seguimiento.service';
 export class TodoCargaService {
   private myAppUrl: string;
   private listar: string;
+  private buscar: string;
+  private guiaRuta: string;
   private insertar: string;
   private headers: HttpHeaders;
 
@@ -20,6 +23,8 @@ export class TodoCargaService {
 
     this.myAppUrl = `${environment.endpoint}api/troncal`;
     this.listar = ''
+    this.guiaRuta = '/guiaRuta'
+    this.buscar = '/buscar'
     this.insertar = '/insert'
 
     this.headers = this.createHeaders();
@@ -32,6 +37,18 @@ export class TodoCargaService {
 
   getTodoCarga(): Observable<Todo_carga[]> {
     return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.listar}`, { headers: this.headers });
+  }
+
+  getBuscarGuia(valor: string): Observable<Todo_carga[]> {
+    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.buscar}?valor=${valor}`, { headers: this.headers });
+  }
+
+  getDatosGuiaRuta(): Observable<Todo_carga[]> {
+    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.guiaRuta}`, { headers: this.headers });
+  }
+
+  getDatosGuiaRutaPorRutaId(ruta_id: number): Observable<Todo_carga[]> {
+    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.guiaRuta}?ruta_id=${ruta_id}`, { headers: this.headers });
   }
 
   insertTodoCarga(todoCarga: Todo_carga): Observable<any> {

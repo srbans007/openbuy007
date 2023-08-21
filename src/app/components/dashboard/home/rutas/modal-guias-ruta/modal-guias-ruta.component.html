@@ -9,7 +9,7 @@
         <div class="centered-content">
             <mat-form-field appearance="fill" fxFlex="45">
                 <mat-label>Guia - Boleta - LPN</mat-label>
-                <input matInput placeholder="...">
+                <input id="inputGuia" (keyup.enter)="onBuscarGuia()" matInput placeholder="..." [(ngModel)]="guiaInputValue">
             </mat-form-field>
         </div>
     </mat-card>
@@ -78,7 +78,6 @@
         </mat-card>
     </div>
     <div class="modal-footer">
-        <button mat-raised-button color="warn" >Cerrar</button>
-        
+        <button mat-raised-button color="warn" (click)="onNoClick()">Cerrar</button>
     </div>
 </div>
