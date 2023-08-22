@@ -31,7 +31,8 @@ export class SeguimientoService {
     return this.http.get<Seguimiento[]>(`${this.myAppUrl}${this.listar}`, { headers: this.headers });
   }
 
-  insertSeguimiento(seguimiento: Seguimiento): Observable<Seguimiento> {
-    return this.http.post<Seguimiento>(`${this.myAppUrl}${this.insertar}`, seguimiento, { headers: this.headers });
-  }
+  insertSeguimiento(seguimiento: Seguimiento[]): Observable<Seguimiento[]> {
+    return this.http.post<Seguimiento[]>(`${this.myAppUrl}${this.insertar}`, seguimiento, { headers: this.headers });
+}
+
 }

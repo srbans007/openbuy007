@@ -4,8 +4,12 @@
     <div class="modal-header">
         <h3>Agregar Guía</h3>
     </div>
-
+    
     <mat-card class="top-card inputGuia" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+        <button *ngIf="tiendasPresentes.has('abcdin')" mat-raised-button class="tienda" color="warn" (click)="generatePDF('ABCDIN')">ABCDIN</button>
+        <button *ngIf="tiendasPresentes.has('hites')" mat-raised-button class="tienda" color="warn" (click)="generatePDF('HITES')">HITES</button>
+        <button *ngIf="tiendasPresentes.has('la polar')" mat-raised-button class="tienda" color="warn" (click)="generatePDF('LA POLAR')">La Polar</button>
+        
         <div class="centered-content">
             <mat-form-field appearance="fill" fxFlex="45">
                 <mat-label>Guia - Boleta - LPN</mat-label>
@@ -13,6 +17,7 @@
             </mat-form-field>
         </div>
     </mat-card>
+    
 
     <div class="modal-body" fxLayout="row" fxLayoutGap="20px">
         <mat-card class="left-content">

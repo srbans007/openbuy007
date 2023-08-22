@@ -13,6 +13,7 @@ export class TodoCargaService {
   private myAppUrl: string;
   private listar: string;
   private buscar: string;
+  private update: string;
   private guiaRuta: string;
   private insertar: string;
   private headers: HttpHeaders;
@@ -24,6 +25,7 @@ export class TodoCargaService {
     this.myAppUrl = `${environment.endpoint}api/troncal`;
     this.listar = ''
     this.guiaRuta = '/guiaRuta'
+    this.update = '/update'
     this.buscar = '/buscar'
     this.insertar = '/insert'
 
@@ -50,6 +52,10 @@ export class TodoCargaService {
   getDatosGuiaRutaPorRutaId(ruta_id: number): Observable<Todo_carga[]> {
     return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.guiaRuta}?ruta_id=${ruta_id}`, { headers: this.headers });
   }
+
+  updateGuia(ruta: Todo_carga[]): Observable<Todo_carga[]> {
+    return this.http.post<Todo_carga[]>(`${this.myAppUrl}${this.update}`, ruta, { headers: this.headers });
+  } 
 
   insertTodoCarga(todoCarga: Todo_carga): Observable<any> {
     return this.http.post<Todo_carga>(`${this.myAppUrl}${this.insertar}`, todoCarga, { headers: this.headers })
