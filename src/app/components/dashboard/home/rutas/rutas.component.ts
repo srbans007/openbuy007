@@ -21,6 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ModalRutasComponent } from './modal-rutas/modal-rutas.component';
 import { ModalGuiasRutaComponent } from './modal-guias-ruta/modal-guias-ruta.component';
+import * as moment from 'moment';
 
 export interface DialogMant {
   valueMant: string;
@@ -96,7 +97,14 @@ export class RutasComponent {
         return tpTim ? tpTim.nombreTim : '';
       }
     },
-    { field: 'createdAt', headerName: 'Fecha Creación' },
+    { 
+      field: 'createdAt', 
+      headerName: 'Fecha Creación',
+      valueFormatter: (params: { value: moment.MomentInput; }) => {
+          const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
+          return dateInSantiago;
+      }
+    },
 
     {
       headerName: "Acciones",

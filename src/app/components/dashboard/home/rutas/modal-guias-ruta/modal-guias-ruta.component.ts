@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ICellRendererParams, CellClickedEvent, ColDef, ColumnApi, GridApi } from 'ag-grid-community';
-import { Observable, concatMap, combineLatest } from 'rxjs';
+import { Observable, concatMap, lastValueFrom } from 'rxjs';
 import { GuiaRuta } from 'src/app/interfaces/guiaRuta';
 import { Ruta } from 'src/app/interfaces/ruta';
 import { Seguimiento } from 'src/app/interfaces/seguimiento';
@@ -25,6 +25,8 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 import { ChangeDetectorRef } from '@angular/core';
+import * as moment from 'moment-timezone';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-modal-guias-ruta',
@@ -73,7 +75,14 @@ export class ModalGuiasRutaComponent {
     { field: 'guia.guia', headerName: 'Guía' },
     { field: 'guia.boleta', headerName: 'Boleta' },
     { field: 'guia.lpn', headerName: 'LPN' },
-    { field: 'guia.createdAt', headerName: 'Fecha Creación' },
+    {
+      field: 'createdAt',
+      headerName: 'Fecha Creación',
+      valueFormatter: (params: { value: moment.MomentInput; }) => {
+        const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
+        return dateInSantiago;
+      }
+    },
     {
       headerName: "Acciones",
       field: "actions",
@@ -93,9 +102,11 @@ export class ModalGuiasRutaComponent {
   @ViewChild('filterInput') filterInput!: ElementRef;
   @ViewChild('inputGuia') inputGuia!: ElementRef;
 
+
   // Constructor e inicialización
 
   constructor(
+    private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private router: Router,
     private _agGridService: AgGridService,
@@ -131,9 +142,6 @@ export class ModalGuiasRutaComponent {
       console.error("id no está definido");
     }
 
-    
-    
-
   }
 
   tiendasPresentes: Set<string> = new Set();
@@ -143,60 +151,59 @@ export class ModalGuiasRutaComponent {
     this.getGuiasId();
     this._agGridService.autoSizeAll(this.gridColumnApi, false);
 
-  // Limpia las tiendas presentes previamente
-  this.tiendasPresentes.clear();
+    // Limpia las tiendas presentes previamente
+    this.tiendasPresentes.clear();
 
-  // Verifica las tiendas presentes en la grilla de ag-grid
-  this.gridApi.forEachNode((node) => {
-    const tiendaName = node.data.guia.tienda.nombre_tienda.toLowerCase();
-    this.tiendasPresentes.add(tiendaName);
-    console.log('datosTienda', node)
-  });
-  
+    // Verifica las tiendas presentes en la grilla de ag-grid
+    this.gridApi.forEachNode((node) => {
+      const tiendaName = node.data.guia.tienda.nombre_tienda.toLowerCase();
+      this.tiendasPresentes.add(tiendaName);
+      console.log('datosTienda', node)
+    });
 
-  // Forzar la detección de cambios
-  this.cdr.detectChanges();
+
+    // Forzar la detección de cambios
+    this.cdr.detectChanges();
   }
 
   getGuiasId() {
     if (this.data.dataGuia.id !== undefined) {
-        this._TodoCargaService.getDatosGuiaRutaPorRutaId(this.data.dataGuia.id).subscribe({
-            next: data => {
-                this.rowData$ = data;
-                console.log("Data received", data);
+      this._TodoCargaService.getDatosGuiaRutaPorRutaId(this.data.dataGuia.id).subscribe({
+        next: data => {
+          this.rowData$ = data;
+          console.log("Data received", data);
 
-                // Mueve la lógica de detección de tiendas aquí
-                this.detectStoresFromData(data);
-            },
-            error: error => {
-                console.error('Ocurrió un error:', error);
-                if (error.status === 400) {
-                    this.logOut();
-                }
-            },
-            complete: () => {
-                console.log('Data loading complete');
-            }
-        });
+          // Mueve la lógica de detección de tiendas aquí
+          this.detectStoresFromData(data);
+        },
+        error: error => {
+          console.error('Ocurrió un error:', error);
+          if (error.status === 400) {
+            this.logOut();
+          }
+        },
+        complete: () => {
+          console.log('Data loading complete');
+        }
+      });
     }
-}
+  }
 
-detectStoresFromData(data: any[]) {
+  detectStoresFromData(data: any[]) {
     // Limpia las tiendas presentes previamente
     this.tiendasPresentes.clear();
 
     // Verifica las tiendas presentes en la grilla de ag-grid
     data.forEach(item => {
-        const tiendaName = item.guia.tienda.nombre_tienda.toLowerCase();
-        this.tiendasPresentes.add(tiendaName);
+      const tiendaName = item.guia.tienda.nombre_tienda.toLowerCase();
+      this.tiendasPresentes.add(tiendaName);
     });
 
     console.log('tiendas presentes:', Array.from(this.tiendasPresentes));
 
     // Forzar la detección de cambios
     this.cdr.detectChanges();
-}
-
+  }
 
   onBuscarGuia() {
     const encodedGuia = encodeURIComponent(this.guiaInputValue);
@@ -217,7 +224,7 @@ detectStoresFromData(data: any[]) {
 
           this.newGuiaRuta = resultArray;
           this.onAddClick();
-          console.log('guiaqlia',this.guiaInputValue)
+          console.log('guiaqlia', this.guiaInputValue)
 
           this.guiaInputValue = '';
         },
@@ -242,7 +249,7 @@ detectStoresFromData(data: any[]) {
           verticalPosition: 'top'
         });
 
-        guiasAdded = guiaRutas;  // <-- Guarda guiaRutas aquí
+        guiasAdded = guiaRutas;
 
         const seguimientos = guiaRutas.map(guia => ({
           id_guia: guia.id_guia!,
@@ -270,7 +277,6 @@ detectStoresFromData(data: any[]) {
       }
     });
   }
-
 
   deleteRow(data: any) {
     console.log('dato eliminado', data)
@@ -357,7 +363,6 @@ detectStoresFromData(data: any[]) {
     });
   }
 
-
   //si no hay token o hay manoseo de token pa juerah
   logOut() {
     localStorage.removeItem('token');
@@ -389,7 +394,7 @@ detectStoresFromData(data: any[]) {
       'Guía': row.guia.guia,
       'Boleta': row.guia.boleta,
       'LPN': row.guia.lpn,
-      'Fecha Creación': row.guia.createdAt
+      'Fecha Creación': row.createdAt
       // ... (y así para cualquier otro campo que quieras exportar)
     };
   }
@@ -397,85 +402,168 @@ detectStoresFromData(data: any[]) {
   //manejo de tiendas
   currentStore: string = '';
   transformRowForPDF(row: any): any[] {
+    const createdAtInSantiago = moment(row.createdAt).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
+
     return [
-      row.guia.tienda.nombre_tienda,
       row.guia.guia,
       row.guia.boleta,
-      row.guia.cliente,
       row.guia.lpn,
-      row.guia.createdAt
+      row.guia.producto,
+      row.guia.cliente,
+      row.guia.direccion_cliente,
+      row.guia.comuna_cliente,
+      row.guia.fono_cliente,
+      createdAtInSantiago
     ];
-}
+  }
 
-generatePDF(store: string) {
+  async generatePDF(store: string) {
+    const imageBase64 = await this.getImageAsBase64();
+    const dimensions = await this.getImageDimensions(imageBase64);
+
+    const scaledWidth = dimensions.width * 0.1;
+    const scaledHeight = dimensions.height * 0.1;
+
+    const totalUniqueGuides = new Set();
+
+    // Primero, cuenta todas las guías únicas en la grilla
+    this.gridApi.forEachNode((node) => {
+      const guideNumber = node.data.guia.guia;
+      if (guideNumber) {
+        totalUniqueGuides.add(guideNumber);
+      }
+    });
+
+    // Datos de ag-grid
+    const bodyData = [];
+    bodyData.push(['#', 'Guía', 'Boleta', 'LPN', 'Producto', 'Cliente', 'Dirección', 'Comuna', 'Contacto', 'Ingreso']);
+
+    const processedGuides = new Set();
+    const uniqueGuidesForStore = new Set();
+    let counter = 1;
+
+    this.gridApi.forEachNodeAfterFilter((node) => {
+      const guideNumber = node.data.guia.guia;
+      if (guideNumber && node.data.guia.tienda.nombre_tienda === store) {
+        uniqueGuidesForStore.add(guideNumber);
+
+        const transformedRow = this.transformRowForPDF(node.data);
+
+        if (!processedGuides.has(guideNumber)) {
+          transformedRow.unshift(counter++);
+          processedGuides.add(guideNumber); // Agrega el número de la guía al conjunto
+        } else {
+          transformedRow.unshift(''); // Si la guía ya fue procesada, deja el espacio del contador vacío
+        }
+
+        bodyData.push(transformedRow);
+      }
+    });
+
+    const bodyTable = {
+      style: 'bodyFont',
+      table: {
+        widths: [10, 50, 50, '*', 120, 85, 120, 70, 60, 60], // Ajusta estos valores según el contenido de tus columnas
+        body: bodyData
+      },
+      layout: {
+        hLineWidth: function () {
+          return 0.5;  // grosor de la línea horizontal
+        },
+        vLineWidth: function () {
+          return 0.5;  // grosor de la línea vertical
+        }
+      }
+    };
+
+    const numberOfTotalUniqueGuides = totalUniqueGuides.size;
+    const lastGuideCountForStore = counter - 1;
+
     // Encabezado del PDF
     const headerTable = {
       table: {
-          widths: ['25%', '25%', '25%', '25%'],
-          body: [
-              [{text: 'Tienda ' + store.toUpperCase(), style: 'header2', colSpan: 3}, {}, {}, {text: 'Image Here', style: 'imageStyle'}],
-              [
-                  {text: 'Chofer: ' + this.chofer[0].nombres + ' ' + this.chofer[0].apellidos, style: 'bodyFont'},
-                  {text: 'Cantidad Guias: ' + 'Placeholder', style: 'bodyFont'},
-                  {text: 'Ruta: ' + this.nombreRuta[0].nombre_ruta, style: 'bodyFont'},
-                  {text: 'Patente: ' + this.patente[0].patente, style: 'bodyFont'}
-              ],
-              [
-                  {text: 'Ayudante: ' + this.ayudante[0].nombres + ' ' + this.ayudante[0].apellidos, style: 'bodyFont'},
-                  {text: 'Cantidad Bultos: ' + 'Placeholder Bultos', style: 'bodyFont'},
-                  {text: 'Fecha: ' + '', style: 'bodyFont'},
-                  {text: 'Tienda: ' + 'Placeholder Tienda', style: 'bodyFont'}
-              ]
+        widths: ['*', '*', '*', '*'],
+        body: [
+          [{ text: 'Tienda ' + store.toUpperCase(), style: 'header2', colSpan: 3 }, {}, {}, { image: imageBase64, width: scaledWidth, height: scaledHeight, alignment: 'right' }],
+          [
+            { text: 'Chofer: ' + this.chofer[0].nombres + ' ' + this.chofer[0].apellidos, style: 'bodyFont' },
+            { text: 'Cantidad x tienda: ' + lastGuideCountForStore, style: 'bodyFont' },
+            { text: 'Ruta: ' + this.nombreRuta[0].nombre_ruta, style: 'bodyFont' },
+            { text: 'Patente: ' + this.patente[0].patente, style: 'bodyFont' }
+          ],
+          [
+            { text: 'Ayudante: ' + this.ayudante[0].nombres + ' ' + this.ayudante[0].apellidos, style: 'bodyFont' },
+            { text: 'Total General: ' + numberOfTotalUniqueGuides, style: 'bodyFont' },
+            { text: 'Fecha: ' + '', style: 'bodyFont' },
+            { text: 'Tienda: ' + '', style: 'bodyFont' }
           ]
+        ]
       },
       layout: 'noBorders'
-  };
-
-  //Datos de ag-grid
-  const bodyData = [];
-  bodyData.push(['Tienda', 'Guía', 'Boleta', 'Cliente', 'LPN', 'Fecha Creación']);
-  
-  this.gridApi.forEachNodeAfterFilter((node) => {
-      if (node.data.guia.tienda.nombre_tienda === store) {
-          bodyData.push(this.transformRowForPDF(node.data));
-      }
-  });
-
-    const bodyTable = {
-        style: 'bodyFont',
-        table: {
-          widths: [100, 70, 70, '*', '*', 90], // Ajusta estos valores según el contenido de tus columnas
-          body: bodyData
-      }
     };
 
     // Definición del documento para pdfMake
     const docDefinition = {
-        content: [
-            headerTable,
-            bodyTable
-        ],
-        styles: {
-            header: {
-                fontSize: 14,
-                bold: true,
-                border: -1
-            },
-            bodyFont: {
-                fontSize: 10,
-                bold: false
-            }
+      content: [
+        headerTable,
+        bodyTable
+      ],
+      styles: {
+        header: {
+          fontSize: 16,
+          bold: true
         },
-        pageSize: { width: 595.28, height: 841.89 }, // Tamaño A4
-        pageOrientation: 'landscape' as const,
-        pageMargins: [28.3, 28.3, 28.3, 28.3]// Margen de 1cm en cada lado
+        bodyFont: {
+          fontSize: 8,
+          bold: false
+        }
+      },
+      pageSize: { width: 595.28, height: 841.89 }, // Tamaño A4
+      pageOrientation: 'landscape' as const,
+      pageMargins: [28.3, 28.3, 28.3, 28.3] // Margen de 1cm en cada lado
     };
 
     // Genera y descarga el PDF
     pdfMake.createPdf(docDefinition as any).download(`timConductor_${store}.pdf`);
-}
+  }
 
 
+  async getImageAsBase64(): Promise<string> {
+    const imagePath = '../../../../../../assets/img/openbuy.png';
+
+    try {
+      const blobData = await lastValueFrom(this.http.get(imagePath, { responseType: 'blob' }));
+
+      if (blobData) {
+        return this.convertBlobToBase64(blobData);
+      } else {
+        console.error("Error al obtener la imagen: respuesta vacía");
+        return '';
+      }
+    } catch (error) {
+      console.error("Error al obtener la imagen:", error);
+      return '';
+    }
+  }
+
+  private convertBlobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  getImageDimensions(base64: string): Promise<{ width: number, height: number }> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        resolve({ width: img.width, height: img.height });
+      };
+      img.src = base64;
+    });
+  }
 
 
   onNoClick(): void {

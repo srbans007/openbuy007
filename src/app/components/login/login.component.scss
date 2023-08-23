@@ -1,0 +1,45 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #d4edda; // Bootstrap success green
+
+    .body {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .logo {
+        width: 100%;
+        margin-left: 30px; 
+        display: block;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        margin: 20px auto;
+        padding: 20px;
+        mat-card-header {
+            mat-card-title {
+                display: flex;
+                justify-content: center; // Centra el contenido horizontalmente
+            }
+        }
+        mat-card-content {
+            // Adding spacing between form fields and the button
+            mat-form-field {
+                margin-bottom: 20px;
+            }
+
+            button {
+                margin-top: 20px;
+            }
+        }
+    }
+
+    .full-width {
+        width: 100%;
+    }
+}
