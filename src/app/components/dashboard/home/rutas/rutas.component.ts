@@ -297,17 +297,7 @@ export class RutasComponent {
     this._agGridService.quickSearch(this.agGrid, searchText);
   }
 
-  onExportClick() {
-    const filteredRows: any[] = [];
-    this.gridApi.forEachNodeAfterFilter((node) => {
-      filteredRows.push(node.data);
-    });
 
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredRows);
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, 'rutas.xlsx');
-  }
 
   
 }

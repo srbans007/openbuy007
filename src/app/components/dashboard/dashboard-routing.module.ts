@@ -9,6 +9,7 @@ import { TodoCargaComponent } from './home/todo-carga/todo-carga.component';
 import { AuthGuard } from 'src/app/utils/auth.guard';
 import { MantenedoresComponent } from './home/mantenedores/mantenedores.component';
 import { RutasComponent } from './home/rutas/rutas.component';
+import { SeguimientoComponent } from './home/seguimiento/seguimiento.component';
 
 
 const routes: Routes = [
@@ -18,7 +19,8 @@ const routes: Routes = [
       {path: 'carga-datos', component: CargaDatosComponent},
       {path: 'todo-carga', component: TodoCargaComponent},
       {path: 'mantenedores', component: MantenedoresComponent},
-      {path: 'ruta', component: RutasComponent}
+      {path: 'ruta', component: RutasComponent},
+      {path: 'seguimiento', component: SeguimientoComponent}
 
     ], canActivate: [AuthGuard]
   }

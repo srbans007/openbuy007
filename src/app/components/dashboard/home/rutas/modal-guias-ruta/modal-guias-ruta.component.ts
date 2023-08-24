@@ -254,7 +254,7 @@ export class ModalGuiasRutaComponent {
         const seguimientos = guiaRutas.map(guia => ({
           id_guia: guia.id_guia!,
           id_ruta: guia.id_ruta!,
-          marcaPgd: 2
+          marcaPgd: 5
         }));
 
         return this._SeguimientoService.insertSeguimiento(seguimientos);

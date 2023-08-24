@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Todo_carga } from 'src/app/interfaces/todo-carga';
 import { TodoCargaService } from 'src/app/services/todo-carga.service';
 import { Router } from '@angular/router';
-import { ColDef, ColumnApi, CellClickedEvent } from 'ag-grid-community';
+import { ColDef, ColumnApi, CellClickedEvent, IRowNode } from 'ag-grid-community';
 import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
 import { Tienda } from 'src/app/interfaces/tienda';
 import { Sucursal } from 'src/app/interfaces/sucursal';
@@ -51,19 +51,20 @@ export class TodoCargaComponent {
         return sucursal ? sucursal.nombre_sucursal : '';
       }
     },
-    { field: 'boleta' },
     { field: 'guia' },
+    { field: 'boleta' },
+    { field: 'lpn', headerName: 'LPN' },
+    { field: 'marcaPgd', headerName: 'Estado'  },
     { field: 'sku' },
     { field: 'producto' },
     { field: 'cantidad' },
     { field: 'bulto' },
-    { field: 'rut_cliente', headerName: 'Rut' },
-    { field: 'fono_cliente', headerName: 'Cliente' },
-    { field: 'email_cliente', headerName: 'Email' },
+    { field: 'cliente', headerName: 'Cliente' },
+    { field: 'fono_cliente', headerName: 'Contacto' },
     { field: 'direccion_cliente', headerName: 'Dirección' },
     { field: 'comuna_cliente', headerName: 'Comuna' },
     { field: 'fecha_compromiso', headerName: 'Fecha Compromiso' },
-    { field: 'lpn', headerName: 'LPN' }
+    
   ];
 
   public defaultColDef: ColDef = {
@@ -132,17 +133,80 @@ export class TodoCargaComponent {
   }
 
   onExportClick() {
-    // Obtener las filas filtradas
-    const filteredRows: any[] = [];
-    this.gridApi.forEachNodeAfterFilter((node) => {
-      filteredRows.push(node.data);
-    });
+    const processedRows: any[] = [];
+    const previousGuides: Set<string> = new Set();
 
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredRows);
+    const nodesArray: IRowNode<any>[] = [];
+    this.gridApi.forEachNode(node => nodesArray.push(node));
+    
+
+
+    nodesArray.sort((a, b) => {
+      const tiendaA = this.tiendas.find(t => t.id === a.data.id_tienda);
+      const tiendaB = this.tiendas.find(t => t.id === b.data.id_tienda);
+  
+      const nombreTiendaA = tiendaA?.nombre_tienda || '';
+      const nombreTiendaB = tiendaB?.nombre_tienda || '';
+  
+      if (nombreTiendaA < nombreTiendaB) return -1;
+      if (nombreTiendaA > nombreTiendaB) return 1;
+  
+      if (a.data.guia < b.data.guia) return -1;
+      if (a.data.guia > b.data.guia) return 1;
+  
+      return new Date(a.data.fecha_compromiso).getTime() - new Date(b.data.fecha_compromiso).getTime();
+  });
+
+  
+
+    for (const node of nodesArray) {
+        const data = node.data;
+        const guide = data.guia;
+        
+        const tienda = this.tiendas.find(t => t.id === data.id_tienda);
+        const sucursal = this.sucursales.find(s => s.id === data.id_sucursal);
+        
+        const guiaValue = previousGuides.has(guide) ? '' : guide;
+
+        const row = {
+            'Fecha de Carga': data.fecha_carga,
+            'Tienda': tienda?.nombre_tienda || '',
+            'Sucursal': sucursal?.nombre_sucursal || '',
+            'Guia': guiaValue,
+            'Boleta': data.boleta,
+            'LPN': data.lpn,
+            'Estado': data.marcaPgd,
+            'SKU': data.sku,
+            'Producto': data.producto,
+            'Cantidad': data.cantidad,
+            'Bulto': data.bulto,
+            'Dirección': data.direccion_cliente,
+            'Comuna': data.comuna_cliente,
+            'Cliente': data.cliente,
+            'Contacto': data.fono_cliente,
+            'Fecha Compromiso': this.formatDateToExcelFriendly(data.fecha_compromiso)
+        };
+
+        if (!previousGuides.has(guide)) {
+            previousGuides.add(guide);
+        }
+
+        processedRows.push(row);
+    }
+
+    // Convertir las filas en una hoja de trabajo de Excel
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(processedRows);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
     // Guardar archivo
     XLSX.writeFile(wb, 'sucursales.xlsx');
-  }
+}
+
+// 1. Función para reformatar la fecha:
+formatDateToExcelFriendly(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;  // Formato DD/MM/YYYY
+}
+
 }

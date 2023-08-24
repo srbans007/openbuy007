@@ -12,6 +12,7 @@ import { GuiaRuta } from '../interfaces/guiaRuta';
 export class TodoCargaService {
   private myAppUrl: string;
   private listar: string;
+  private seguimiento: string;
   private buscar: string;
   private update: string;
   private guiaRuta: string;
@@ -24,6 +25,7 @@ export class TodoCargaService {
 
     this.myAppUrl = `${environment.endpoint}api/troncal`;
     this.listar = ''
+    this.seguimiento = '/seguimiento'
     this.guiaRuta = '/guiaRuta'
     this.update = '/update'
     this.buscar = '/buscar'
@@ -39,6 +41,10 @@ export class TodoCargaService {
 
   getTodoCarga(): Observable<Todo_carga[]> {
     return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.listar}`, { headers: this.headers });
+  }
+
+  getSeguimiento(): Observable<Todo_carga[]> {
+    return this.http.get<Todo_carga[]>(`${this.myAppUrl}${this.seguimiento}`, { headers: this.headers });
   }
 
   getBuscarGuia(valor: string): Observable<Todo_carga[]> {
