@@ -3,9 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-    production: false,
-    //endpoint: 'https://api.openbuyhogar.cl/'
-    endpoint: 'http://localhost:3001/'
+    production: true,
+    endpoint: 'https://api.openbuyhogar.cl/'
+    //endpoint: 'http://localhost:3001/'
   };
   
   /*

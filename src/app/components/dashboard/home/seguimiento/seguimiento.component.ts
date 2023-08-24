@@ -128,21 +128,21 @@ export class SeguimientoComponent {
     //procesar filas y ordenarlas
     const processedRows: any[] = [];
     this.gridApi.forEachNodeAfterFilterAndSort((node) => {
-      const data = node.data;
-      const row = {
-        'Tienda': data.cargaTroncal.tienda.nombre_tienda,
-        'Guia': data.cargaTroncal.guia,
-        'Boleta': data.cargaTroncal.boleta,
-        'LPN': data.cargaTroncal.lpn,
-        'Producto': data.cargaTroncal.producto,
-        'Chofer': data.ruta && data.ruta.chofer && data.ruta.chofer.tipoTransporte.transporte === 'Chofer' ? 
-                  `${data.ruta.chofer.nombres || ''} ${data.ruta.chofer.apellidos || ''}` : '',
-        'Ayudante': data.ruta && data.ruta.ayudante && data.ruta.ayudante.tipoTransporte.transporte === 'Ayudante' ? 
-                  `${data.ruta.ayudante.nombres || ''} ${data.ruta.ayudante.apellidos || ''}` : '',
-        'Estado': data.cargaTroncal.seguimiento.marcaPgd,
-        'Fecha Creación': data.createdAt
-      };
-      processedRows.push(row);
+        const data = node.data;
+        const row = {
+            'Tienda': data.guia.tienda.nombre_tienda,
+            'Guia': data.guia.guia,
+            'Boleta': data.guia.boleta,
+            'LPN': data.guia.lpn,
+            'Producto': data.guia.producto,
+            'Chofer': data.ruta && data.ruta.chofer && data.ruta.chofer.tipoTransporte.transporte === 'Chofer' ? 
+                      `${data.ruta.chofer.nombres || ''} ${data.ruta.chofer.apellidos || ''}` : '',
+            'Ayudante': data.ruta && data.ruta.ayudante && data.ruta.ayudante.tipoTransporte.transporte === 'Ayudante' ? 
+                      `${data.ruta.ayudante.nombres || ''} ${data.ruta.ayudante.apellidos || ''}` : '',
+            'Estado': data.guia.marcaPgd,
+            'Fecha Creación': moment(data.createdAt).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss')
+        };
+        processedRows.push(row);
     });
 
     // Convertir las filas en una hoja de trabajo de Excel
@@ -150,10 +150,8 @@ export class SeguimientoComponent {
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
-
     // Guardar archivo
     XLSX.writeFile(wb, 'seguimiento.xlsx');
 }
-
 
 }
