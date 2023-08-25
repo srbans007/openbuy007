@@ -53,7 +53,7 @@ export class GuiasProcesadasService {
     return this.http.post<GuiaProcesada[]>(`${this.myAppUrl}${this.update}`, ruta, { headers: this.headers });
   } 
 
-  insertGuiaProcesada(todoCarga: GuiaProcesada): Observable<any> {
-    return this.http.post<GuiaProcesada>(`${this.myAppUrl}${this.insertar}`, todoCarga, { headers: this.headers })
+  insertGuiaProcesada(guiaProcesada: GuiaProcesada[]): Observable<any> {
+    return this.http.post<GuiaProcesada[]>(`${this.myAppUrl}${this.insertar}`, guiaProcesada, { headers: this.headers })
   }
 }
