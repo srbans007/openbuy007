@@ -7,9 +7,11 @@ import { TodoCargaComponent } from './home/todo-carga/todo-carga.component';
 
 //validar login
 import { AuthGuard } from 'src/app/utils/auth.guard';
+
 import { MantenedoresComponent } from './home/mantenedores/mantenedores.component';
 import { RutasComponent } from './home/rutas/rutas.component';
 import { SeguimientoComponent } from './home/seguimiento/seguimiento.component';
+import { GuiasProcesadasComponent } from './home/guias-procesadas/guias-procesadas.component';
 
 
 const routes: Routes = [
@@ -20,7 +22,8 @@ const routes: Routes = [
       {path: 'todo-carga', component: TodoCargaComponent},
       {path: 'mantenedores', component: MantenedoresComponent},
       {path: 'ruta', component: RutasComponent},
-      {path: 'seguimiento', component: SeguimientoComponent}
+      {path: 'seguimiento', component: SeguimientoComponent},
+      {path: 'guias-procesadas', component: GuiasProcesadasComponent}
 
     ], canActivate: [AuthGuard]
   }

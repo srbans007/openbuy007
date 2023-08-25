@@ -17,7 +17,8 @@ export class DashboardComponent{
     {path: 'carga-datos', title: 'CARGA DE DATOS', icon: 'cloud_upload'},
     {path: 'todo-carga', title: 'TODO CARGA', icon: 'menu_book'},
     {path: 'ruta', title: 'RUTAS', icon: 'local_shipping'},
-    {path: 'seguimiento', title: 'SEGUIMIENTO', icon: 'location_searching'}
+    {path: 'seguimiento', title: 'SEGUIMIENTO', icon: 'location_searching'},
+    {path: 'guias-procesadas', title: 'GUIAS PROCESADAS', icon: 'flag'}
   ];
 
   constructor(

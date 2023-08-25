@@ -8,7 +8,6 @@ import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi } from 'ag-grid-community';
 import * as XLSX from 'xlsx';
 import { Seguimiento } from 'src/app/interfaces/seguimiento';
-import { SeguimientoService } from 'src/app/services/seguimiento.service';
 import * as moment from 'moment';
 import { TodoCargaService } from 'src/app/services/todo-carga.service';
 
@@ -38,7 +37,7 @@ export class SeguimientoComponent {
     { field: 'guia.boleta', headerName: 'Boleta' },
     { field: 'guia.lpn', headerName: 'LPN' },
     { field: 'guia.producto', headerName: 'Producto' },
-    { 
+    {
       headerName: 'Chofer',
       valueGetter: (params: any) => {
         if (params.data.ruta && params.data.ruta.chofer && params.data.ruta.chofer.tipoTransporte.transporte === 'Chofer') {
@@ -47,7 +46,7 @@ export class SeguimientoComponent {
         return '';  // Retorna una cadena vacía si no hay datos de chofer o si no es de tipo 'Chofer'
       }
     },
-    { 
+    {
       headerName: 'Ayudante',
       valueGetter: (params: any) => {
         if (params.data.ruta && params.data.ruta.ayudante && params.data.ruta.ayudante.tipoTransporte.transporte === 'Ayudante') {
@@ -57,12 +56,12 @@ export class SeguimientoComponent {
       }
     },
     { field: 'guia.marcaPgd', headerName: 'Estado' },
-    { 
-      field: 'createdAt', 
+    {
+      field: 'createdAt',
       headerName: 'Fecha Creación',
       valueFormatter: (params: { value: moment.MomentInput; }) => {
-          const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
-          return dateInSantiago;
+        const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
+        return dateInSantiago;
       }
     }
   ];
@@ -80,9 +79,7 @@ export class SeguimientoComponent {
   constructor(
     private router: Router,
     private _TodoCargaService: TodoCargaService,
-    private _agGridService: AgGridService,
-    private _TiendaService: TiendaService,
-    private _SucursalService: SucursalService
+    private _agGridService: AgGridService
   ) { }
 
   ngOnInit(): void {
@@ -128,21 +125,21 @@ export class SeguimientoComponent {
     //procesar filas y ordenarlas
     const processedRows: any[] = [];
     this.gridApi.forEachNodeAfterFilterAndSort((node) => {
-        const data = node.data;
-        const row = {
-            'Tienda': data.guia.tienda.nombre_tienda,
-            'Guia': data.guia.guia,
-            'Boleta': data.guia.boleta,
-            'LPN': data.guia.lpn,
-            'Producto': data.guia.producto,
-            'Chofer': data.ruta && data.ruta.chofer && data.ruta.chofer.tipoTransporte.transporte === 'Chofer' ? 
-                      `${data.ruta.chofer.nombres || ''} ${data.ruta.chofer.apellidos || ''}` : '',
-            'Ayudante': data.ruta && data.ruta.ayudante && data.ruta.ayudante.tipoTransporte.transporte === 'Ayudante' ? 
-                      `${data.ruta.ayudante.nombres || ''} ${data.ruta.ayudante.apellidos || ''}` : '',
-            'Estado': data.guia.marcaPgd,
-            'Fecha Creación': moment(data.createdAt).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss')
-        };
-        processedRows.push(row);
+      const data = node.data;
+      const row = {
+        'Tienda': data.guia.tienda.nombre_tienda,
+        'Guia': data.guia.guia,
+        'Boleta': data.guia.boleta,
+        'LPN': data.guia.lpn,
+        'Producto': data.guia.producto,
+        'Chofer': data.ruta && data.ruta.chofer && data.ruta.chofer.tipoTransporte.transporte === 'Chofer' ?
+          `${data.ruta.chofer.nombres || ''} ${data.ruta.chofer.apellidos || ''}` : '',
+        'Ayudante': data.ruta && data.ruta.ayudante && data.ruta.ayudante.tipoTransporte.transporte === 'Ayudante' ?
+          `${data.ruta.ayudante.nombres || ''} ${data.ruta.ayudante.apellidos || ''}` : '',
+        'Estado': data.guia.marcaPgd,
+        'Fecha Creación': moment(data.createdAt).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss')
+      };
+      processedRows.push(row);
     });
 
     // Convertir las filas en una hoja de trabajo de Excel
@@ -152,6 +149,6 @@ export class SeguimientoComponent {
 
     // Guardar archivo
     XLSX.writeFile(wb, 'seguimiento.xlsx');
-}
+  }
 
 }

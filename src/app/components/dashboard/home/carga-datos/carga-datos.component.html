@@ -24,6 +24,31 @@
             </mat-card-content>
         </mat-card>
     </div>
+    <div class="grid-item">
+        <h1 style="padding-left: 10px; margin: 0 !important">CARGA DIARIAS</h1>
+        <h5 style="padding-left: 10px; margin: 5px !important">(CARGA DE ARCHIVO .XLSX)</h5>
+        <mat-card>
+            <mat-card-content>
+              <div class="button-container">
+                <input type="file" class="file-input"
+                   accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                   (change)="onFileSelectedDiarias($event)" #fileUploadDiarias>
+
+                <div class="file-upload">
+                    {{fileName || "Seleccionar Archivo."}}
+                    <button (click)="fileUploadDiarias.click(); fileUploadDiarias.value = ''" mat-stroked-button color="primary" cdkFocusInitial>
+                        Examinar<mat-icon>attach_file</mat-icon>
+                    </button>
+                    <span style="padding: 5px"></span>
+                    <button (click)="onUploadDiarias()" mat-stroked-button color="primary" [disabled]="!fileName">
+                        Cargar<mat-icon>cloud_upload</mat-icon>
+                    </button>
+                </div>
+              </div>
+
+            </mat-card-content>
+        </mat-card>
+    </div>
 </div>
 
 

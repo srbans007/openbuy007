@@ -26,13 +26,13 @@ import { TransportistaComponent } from './home/mantenedores/transportista/transp
 import { TipoTransporteComponent } from './home/mantenedores/tipo-transporte/tipo-transporte.component';
 import { TipoTimComponent } from './home/mantenedores/tipo-tim/tipo-tim.component';
 import { RutasComponent } from './home/rutas/rutas.component';
-import { GuiasEnRutaComponent } from './home/rutas/guias-en-ruta/guias-en-ruta.component';
 import { ModalRutasComponent } from './home/rutas/modal-rutas/modal-rutas.component';
 import { ModalGuiasRutaComponent } from './home/rutas/modal-guias-ruta/modal-guias-ruta.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { GuiasProcesadasComponent } from './home/guias-procesadas/guias-procesadas.component';
 
 
 
@@ -54,9 +54,9 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     TipoTransporteComponent,
     TipoTimComponent,
     RutasComponent,
-    GuiasEnRutaComponent,
     ModalRutasComponent,
-    ModalGuiasRutaComponent
+    ModalGuiasRutaComponent,
+    GuiasProcesadasComponent
   ],
   imports: [
     CommonModule,

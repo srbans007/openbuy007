@@ -8,6 +8,7 @@ import { SucursalService } from 'src/app/services/sucursal.service';
 import { Tienda } from 'src/app/interfaces/tienda';
 import { Sucursal } from 'src/app/interfaces/sucursal';
 import { Router } from '@angular/router';
+import { GuiasProcesadasService } from 'src/app/services/guias-procesadas.service';
 
 @Component({
   selector: 'app-carga-datos',
@@ -15,8 +16,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./carga-datos.component.scss']
 })
 export class CargaDatosComponent {
+  idGuiaRutaToIdMap: { [key: string]: number | undefined } = {};
   fileName = '';
   fileData: any;
+  fileDataDiarias: any;
 
   //usar interfaces para encontrar datos de tienda y sucursal
   tiendas: Tienda[] = [];
@@ -24,6 +27,7 @@ export class CargaDatosComponent {
 
   constructor(
     private router: Router,
+    private _GuiasProcesadasService: GuiasProcesadasService,
     private _TodoCargaService: TodoCargaService,
     private _SeguimientoService: SeguimientoService,
     private _TiendaService: TiendaService,
@@ -76,13 +80,13 @@ export class CargaDatosComponent {
     // el 1900 es considerado como un año bisiesto, así que debemos ajustar si es antes del 1900-03-01.
     const startDate = new Date(1900, 0, 1);
     if (serialDate > 59) {
-        serialDate--;
+      serialDate--;
     }
 
     // Calcula la fecha final sumando los días del número de serie a la fecha de inicio.
     const resultDate = new Date(startDate.getTime() + (serialDate - 1) * 24 * 60 * 60 * 1000);
     return resultDate.toISOString().split('T')[0];  // Devuelve la fecha en formato YYYY-MM-DD
-}
+  }
 
   onFileSelected(event: any) {
     const target: DataTransfer = <DataTransfer>(event.target);
@@ -116,7 +120,7 @@ export class CargaDatosComponent {
             console.log('fecha', this.fileData)
           }
           if (this.fileData[i].hasOwnProperty('fecha_compromiso')) {
-              this.fileData[i].fecha_compromiso = this.serialDateToISO(this.fileData[i].fecha_compromiso);
+            this.fileData[i].fecha_compromiso = this.serialDateToISO(this.fileData[i].fecha_compromiso);
           }
 
           // Agregar 1 a la columna 'marcaPgd' de cada objeto en 'this.fileData'
@@ -184,5 +188,139 @@ export class CargaDatosComponent {
       },
     });
   }
+
+
+  onFileSelectedDiarias(event: any) {
+    const target: DataTransfer = <DataTransfer>(event.target);
+
+    if (target.files && target.files.length > 0) {
+        this.fileName = target.files[0].name;
+        const reader: FileReader = new FileReader();
+
+        reader.onload = (e: any) => {
+            const bstr: string = e.target.result;
+            const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
+            const wsname: string = wb.SheetNames[0];
+            const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+            this.fileDataDiarias = XLSX.utils.sheet_to_json(ws);
+
+            this.fileDataDiarias.forEach((guiaNueva: any) => {
+                this._GuiasProcesadasService.getBuscarGuia(guiaNueva.id_guiaRuta).subscribe(guiasEncontradas => {
+                    if (guiasEncontradas.length > 0) {
+                        this.idGuiaRutaToIdMap[guiaNueva.id_guiaRuta] = guiasEncontradas[0].id;
+                    }
+                });
+            });
+        };
+
+        reader.readAsBinaryString(target.files[0]);
+    }
+}
+
+
+
+onUploadDiarias() {
+  if (this.fileDataDiarias) {
+       // Reemplazar id_guiaRuta con el verdadero ID, sólo si existe en el mapeo
+       this.fileDataDiarias.forEach((guiaNueva: { boleta: string }) => {
+        this._GuiasProcesadasService.getBuscarGuia(guiaNueva.boleta).subscribe(guiasEncontradas => {
+            if (guiasEncontradas && guiasEncontradas.length > 0) {
+                // Iterar sobre todas las guías encontradas con ese número de boleta
+                guiasEncontradas.forEach(guiaToUpdate => {
+                    updateGuia(guiaToUpdate);
+                });
+            } else {
+                processedCount++;
+                if (processedCount === this.fileDataDiarias.length) {
+                    insertNewGuias();
+                }
+            }
+        });
+    });
+
+      // Contador para saber cuántas guías han sido procesadas
+      let processedCount = 0;
+
+      const updateGuia = (guiaToUpdate: any) => {
+          guiaToUpdate.marcaPgd = 3;
+          this._GuiasProcesadasService.updateGuia([guiaToUpdate]).subscribe({
+              next: () => {
+                  console.log(`Guía con boleta ${guiaToUpdate.boleta} actualizada correctamente.`);
+                  processedCount++;
+                  if (processedCount === this.fileDataDiarias.length) {
+                      insertNewGuias();
+                  }
+              },
+              error: (error) => {
+                  console.error(`Error al actualizar guía con boleta ${guiaToUpdate.boleta}:`, error);
+                  processedCount++;
+                  if (processedCount === this.fileDataDiarias.length) {
+                      insertNewGuias();
+                  }
+              }
+          });
+      };
+
+      const insertNewGuias = () => {
+            const guiasToInsert = this.fileDataDiarias.map((guia: { id_guiaRuta: string | number; boleta: any; estado: any; subestado: any; fecha_entregado: any; comentario_beetrack: any; codigo: any; }) => {
+              return {
+                  id_guiaRuta: this.idGuiaRutaToIdMap[guia.id_guiaRuta],
+                  boleta: guia.boleta,
+                  estado: guia.estado,
+                  subestado: guia.subestado,
+                  fecha_entregado: guia.fecha_entregado,
+                  comentario_beetrack: guia.comentario_beetrack,
+                  codigo: guia.codigo
+              };
+          });
+
+          this._GuiasProcesadasService.insertGuiaProcesada(guiasToInsert).subscribe({
+              next: () => {
+                  this._snackBar.open('Guías Procesadas Insertadas.', '', {
+                      duration: 2000,
+                      horizontalPosition: 'center',
+                      verticalPosition: 'top'
+                  });
+                  console.log('Guías Procesadas cargadas');
+              },
+              error: (error) => {
+                  this._snackBar.open('ERROR al insertar guías.', '', {
+                      duration: 2000,
+                      horizontalPosition: 'center',
+                      verticalPosition: 'top'
+                  });
+                  console.error('Error al cargar Guías Procesadas', error);
+              },
+              complete: () => {
+                  this.fileName = '';
+                  this.fileDataDiarias = null;
+                  console.log('Inserción de Guías Procesadas completa');
+              }
+          });
+      };
+
+      this.fileDataDiarias.forEach((guiaNueva: { boleta: string }) => {
+          this._GuiasProcesadasService.getBuscarGuia(guiaNueva.boleta).subscribe(guiasEncontradas => {
+              if (guiasEncontradas && guiasEncontradas.length > 0) {
+                  // Asumimos que sólo hay una guía con esa boleta, de lo contrario, podrías iterar sobre todas las guías encontradas
+                  const guiaToUpdate = guiasEncontradas[0];
+                  updateGuia(guiaToUpdate);
+              } else {
+                  processedCount++;
+                  if (processedCount === this.fileDataDiarias.length) {
+                      insertNewGuias();
+                  }
+              }
+          });
+      });
+  } else {
+      this._snackBar.open('Por favor, selecciona un archivo antes de cargar.', '', {
+          duration: 2000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+      });
+  }
+}
+
 
 }
