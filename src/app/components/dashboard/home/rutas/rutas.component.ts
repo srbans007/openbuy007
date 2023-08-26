@@ -5,7 +5,6 @@ import { AgGridService } from 'src/app/services/ag-grid.service';
 import { Sucursal } from 'src/app/interfaces/sucursal';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi } from 'ag-grid-community';
-import * as XLSX from 'xlsx';
 import { Transportista } from 'src/app/interfaces/transportista';
 import { Vehiculo } from 'src/app/interfaces/vehiculo';
 import { TipoRuta } from 'src/app/interfaces/tipoRuta';
@@ -47,7 +46,7 @@ export class RutasComponent {
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
 
-  columnDefs = [
+  columnDefs: ColDef[] = [
     { field: 'id', hide: true },
     {
       field: 'id_sucursal',
@@ -100,6 +99,8 @@ export class RutasComponent {
     { 
       field: 'createdAt', 
       headerName: 'Fecha Creación',
+      sortable: true,
+      sort: 'desc',
       valueFormatter: (params: { value: moment.MomentInput; }) => {
           const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
           return dateInSantiago;

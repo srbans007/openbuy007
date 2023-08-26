@@ -68,7 +68,7 @@ export class ModalGuiasRutaComponent {
   newGuiaRuta: GuiaRuta[] = [];
 
 
-  columnDefs = [
+  columnDefs: ColDef[] = [
     { field: 'id', hide: true },
     { field: 'id_ruta', hide: true },
     { field: 'guia.tienda.nombre_tienda', headerName: 'Tienda' },
@@ -78,6 +78,8 @@ export class ModalGuiasRutaComponent {
     {
       field: 'createdAt',
       headerName: 'Fecha Creación',
+      sortable: true,
+      sort: 'desc',
       valueFormatter: (params: { value: moment.MomentInput; }) => {
         const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
         return dateInSantiago;

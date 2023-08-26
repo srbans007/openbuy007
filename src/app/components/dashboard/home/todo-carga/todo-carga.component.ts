@@ -2,17 +2,14 @@ import { Component, ViewChild } from '@angular/core';
 import { Todo_carga } from 'src/app/interfaces/todo-carga';
 import { TodoCargaService } from 'src/app/services/todo-carga.service';
 import { Router } from '@angular/router';
-import { ColDef, ColumnApi, CellClickedEvent, IRowNode } from 'ag-grid-community';
-import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
+import { ColDef, ColumnApi, CellClickedEvent, IRowNode, GridApi } from 'ag-grid-community';
+import { AgGridService } from 'src/app/services/ag-grid.service';
 import { Tienda } from 'src/app/interfaces/tienda';
 import { Sucursal } from 'src/app/interfaces/sucursal';
 import { TiendaService } from 'src/app/services/tienda.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { AgGridAngular } from 'ag-grid-angular';
-import { GridApi } from 'ag-grid-community';
 import * as XLSX from 'xlsx';
-
-//import { AgGridModule } from "src/app/components/shared/shared.module";
 
 @Component({
   selector: 'app-todo-carga',
@@ -25,16 +22,19 @@ export class TodoCargaComponent {
   tiendas: Tienda[] = [];
   sucursales: Sucursal[] = [];
 
-  onCellClicked($event: CellClickedEvent<any, any>) {
+  onCellClicked($event: CellClickedEvent<any, any>) { }
 
-  }
-  //private gridApi!: AgGridModule;
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
 
-  columnDefs = [
+  columnDefs: ColDef[] = [
     { field: 'id', hide: true },
-    { field: 'fecha_carga', headerName: 'Fecha de Carga' },
+    {
+      field: 'fecha_carga',
+      headerName: 'Fecha de Carga',
+      sortable: true,
+      sort: 'desc'
+    },
     {
       field: 'id_tienda',
       headerName: 'Tienda',
@@ -54,7 +54,12 @@ export class TodoCargaComponent {
     { field: 'guia' },
     { field: 'boleta' },
     { field: 'lpn', headerName: 'LPN' },
-    { field: 'marcaPgd', headerName: 'Estado'  },
+    {
+      field: 'marcaPgd',
+      headerName: 'Estado',
+      valueGetter: (params: any) => this.getEstadoDisplayValue(params.data.marcaPgd),
+      cellStyle: (params: any) => this.getEstadoCellStyle(params)
+    },
     { field: 'sku' },
     { field: 'producto' },
     { field: 'cantidad' },
@@ -64,7 +69,7 @@ export class TodoCargaComponent {
     { field: 'direccion_cliente', headerName: 'Dirección' },
     { field: 'comuna_cliente', headerName: 'Comuna' },
     { field: 'fecha_compromiso', headerName: 'Fecha Compromiso' },
-    
+
   ];
 
   public defaultColDef: ColDef = {
@@ -74,7 +79,6 @@ export class TodoCargaComponent {
 
   public rowData$!: Todo_carga[];
 
-  // For accessing the Grid's API
   @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
 
   constructor(
@@ -85,9 +89,22 @@ export class TodoCargaComponent {
     private _SucursalService: SucursalService
   ) { }
 
-  ngOnInit(): void {
+  getEstadoCellStyle(params: any): any {
+    if (this.getEstadoDisplayValue(params.value) === 'Entregado') {
+      return { backgroundColor: '#329847' }; // Color warning de Bootstrap
+    }
+    if (this.getEstadoDisplayValue(params.value) === 'Pendiente') {
+      return { backgroundColor: '#e07b39' }; // Color warning de Bootstrap
+    }
+    if (this.getEstadoDisplayValue(params.value) === 'En Ruta') {
+      return { backgroundColor: '#ffc107' }; // Color warning de Bootstrap
+    }
+    if (this.getEstadoDisplayValue(params.value) === 'Anulado/Devolución') {
+      return { backgroundColor: '#2596be' }; // Color warning de Bootstrap
+    }
+  }
 
-    //se reciben los datos para buscar los id
+  ngOnInit(): void {
     this._TiendaService.getTienda().subscribe(t => {
       this.tiendas = t;
     });
@@ -128,6 +145,16 @@ export class TodoCargaComponent {
     this.router.navigate(['/login'])
   }
 
+  getEstadoDisplayValue(value: number): string {
+    switch (value) {
+      case 1: return 'Pendiente';
+      case 2: return 'En Ruta';
+      case 3: return 'Entregado';
+      case 4: return 'Anulado/Incidencia';
+      default: return value.toString();
+    }
+  }
+
   setFilter(searchText: string) {
     this._agGridService.quickSearch(this.agGrid, searchText);
   }
@@ -137,10 +164,8 @@ export class TodoCargaComponent {
     const previousGuides: Set<string> = new Set();
 
     const nodesArray: IRowNode<any>[] = [];
-    this.gridApi.forEachNode(node => nodesArray.push(node));
+    this.gridApi.forEachNodeAfterFilter(node => nodesArray.push(node));
     
-
-
     nodesArray.sort((a, b) => {
       const tiendaA = this.tiendas.find(t => t.id === a.data.id_tienda);
       const tiendaB = this.tiendas.find(t => t.id === b.data.id_tienda);
@@ -157,41 +182,37 @@ export class TodoCargaComponent {
       return new Date(a.data.fecha_compromiso).getTime() - new Date(b.data.fecha_compromiso).getTime();
   });
 
-  
-
     for (const node of nodesArray) {
-        const data = node.data;
-        const guide = data.guia;
-        
-        const tienda = this.tiendas.find(t => t.id === data.id_tienda);
-        const sucursal = this.sucursales.find(s => s.id === data.id_sucursal);
-        
-        const guiaValue = previousGuides.has(guide) ? '' : guide;
+      const data = node.data;
+      const guide = data.guia;
+      const tienda = this.tiendas.find(t => t.id === data.id_tienda);
+      const sucursal = this.sucursales.find(s => s.id === data.id_sucursal);
+      const guiaValue = previousGuides.has(guide) ? '' : guide;
 
-        const row = {
-            'Fecha de Carga': data.fecha_carga,
-            'Tienda': tienda?.nombre_tienda || '',
-            'Sucursal': sucursal?.nombre_sucursal || '',
-            'Guia': guiaValue,
-            'Boleta': data.boleta,
-            'LPN': data.lpn,
-            'Estado': data.marcaPgd,
-            'SKU': data.sku,
-            'Producto': data.producto,
-            'Cantidad': data.cantidad,
-            'Bulto': data.bulto,
-            'Dirección': data.direccion_cliente,
-            'Comuna': data.comuna_cliente,
-            'Cliente': data.cliente,
-            'Contacto': data.fono_cliente,
-            'Fecha Compromiso': this.formatDateToExcelFriendly(data.fecha_compromiso)
-        };
+      const row = {
+        'Fecha de Carga': data.fecha_carga,
+        'Tienda': tienda?.nombre_tienda || '',
+        'Sucursal': sucursal?.nombre_sucursal || '',
+        'Guia': guiaValue,
+        'Boleta': data.boleta,
+        'LPN': data.lpn,
+        'Estado': this.getEstadoDisplayValue(data.marcaPgd),
+        'SKU': data.sku,
+        'Producto': data.producto,
+        'Cantidad': data.cantidad,
+        'Bulto': data.bulto,
+        'Dirección': data.direccion_cliente,
+        'Comuna': data.comuna_cliente,
+        'Cliente': data.cliente,
+        'Contacto': data.fono_cliente,
+        'Fecha Compromiso': data.fecha_compromiso
+      };
 
-        if (!previousGuides.has(guide)) {
-            previousGuides.add(guide);
-        }
+      if (!previousGuides.has(guide)) {
+        previousGuides.add(guide);
+      }
 
-        processedRows.push(row);
+      processedRows.push(row);
     }
 
     // Convertir las filas en una hoja de trabajo de Excel
@@ -201,12 +222,7 @@ export class TodoCargaComponent {
 
     // Guardar archivo
     XLSX.writeFile(wb, 'sucursales.xlsx');
-}
+  }
 
-// 1. Función para reformatar la fecha:
-formatDateToExcelFriendly(dateStr: string): string {
-  const [year, month, day] = dateStr.split('-');
-  return `${day}/${month}/${year}`;  // Formato DD/MM/YYYY
-}
 
 }
