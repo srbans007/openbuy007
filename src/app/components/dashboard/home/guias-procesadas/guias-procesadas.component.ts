@@ -125,45 +125,35 @@ export class GuiasProcesadasComponent {
 
   onExportClick() {
     const processedRows: any[] = [];
-    const nodesArray: IRowNode<any>[] = [];
   
-    // Usar forEachNodeAfterFilter en lugar de forEachNode
-    this.gridApi.forEachNodeAfterFilter(node => nodesArray.push(node));
-  
-    for (const node of nodesArray) {
+    this.gridApi.forEachNodeAfterFilter(node => {
       const data = node.data;
   
       const row = {
-        // ... tus otros campos ...
+        'Fecha Ruta': moment(data.guiaRuta.ruta.createdAt).tz("America/Santiago").format('DD-MM-YYYY'),
+        'Nombre Tienda': data.guiaRuta.guia.tienda.nombre_tienda,
         'Guía': data.guiaRuta.guia.guia,
         'Boleta': data.boleta,
         'Estado': data.estado,
         'Subestado': data.subestado,
+        'Horario Gestión': moment(data.fecha_entregado).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss'),
         'Comentario Beetrack': data.comentario_beetrack,
         'LPN': data.guiaRuta.guia.lpn,
         'Producto': data.guiaRuta.guia.producto,
+        'Cliente': data.guiaRuta.guia.cliente,
+        'Dirección': data.guiaRuta.guia.direccion_cliente,
+        'Comuna': data.guiaRuta.guia.comuna_cliente,
         'Nombre Chofer': `${data.guiaRuta.ruta.chofer.nombres} ${data.guiaRuta.ruta.chofer.apellidos}`,
-        'Nombre Ayudante': `${data.guiaRuta.ruta.ayudante.nombres} ${data.guiaRuta.ruta.ayudante.apellidos}`,
-        'Nombre Tienda': data.guiaRuta.guia.tienda.nombre_tienda
+        'Nombre Ayudante': `${data.guiaRuta.ruta.ayudante.nombres} ${data.guiaRuta.ruta.ayudante.apellidos}`
       };
       processedRows.push(row);
-    }
+    });
   
-    // Convertir las filas en una hoja de trabajo de Excel
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(processedRows);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  
-    // Guardar archivo
-    XLSX.writeFile(wb, 'sucursales.xlsx');
+    XLSX.writeFile(wb, 'guias_procesadas.xlsx');
   }
-  
-  
 
-  // 1. Función para reformatar la fecha:
-  formatDateToExcelFriendly(dateStr: string): string {
-    const [year, month, day] = dateStr.split('-');
-    return `${day}/${month}/${year}`;  // Formato DD/MM/YYYY
-  }
 
 }
