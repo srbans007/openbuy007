@@ -1,26 +1,25 @@
+<div class="modalO">
+    <!-- Entrada de Datos -->
+    <div class="input-section">
+        <mat-form-field appearance="fill">
+            <mat-label>Guia - Boleta - LPN</mat-label>
+            <input id="inputGuia" (keyup.enter)="onBuscarGuia()" matInput placeholder="..."
+                [(ngModel)]="guiaInputValue">
+        </mat-form-field>
 
-<div class="modal">
-    
-    <div class="modal-header">
-        <h3>Agregar Guía</h3>
-    </div>
-    
-    <mat-card class="top-card inputGuia" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
-        <button *ngIf="tiendasPresentes.has('abcdin')" mat-raised-button class="tienda" color="warn" (click)="generatePDF('ABCDIN')">ABCDIN</button>
-        <button *ngIf="tiendasPresentes.has('hites')" mat-raised-button class="tienda" color="warn" (click)="generatePDF('HITES')">HITES</button>
-        <button *ngIf="tiendasPresentes.has('la polar')" mat-raised-button class="tienda" color="warn" (click)="generatePDF('LA POLAR')">La Polar</button>
-        
-        <div class="centered-content">
-            <mat-form-field appearance="fill" fxFlex="45">
-                <mat-label>Guia - Boleta - LPN</mat-label>
-                <input id="inputGuia" (keyup.enter)="onBuscarGuia()" matInput placeholder="..." [(ngModel)]="guiaInputValue">
-            </mat-form-field>
+        <div class="shop-buttons">
+            <button *ngIf="tiendasPresentes.has('abcdin')" mat-raised-button class="tienda" color="warn"
+                (click)="generatePDF('ABCDIN')">ABCDIN</button>
+            <button *ngIf="tiendasPresentes.has('hites')" mat-raised-button class="tienda" color="warn"
+                (click)="generatePDF('HITES')">HITES</button>
+            <button *ngIf="tiendasPresentes.has('la polar')" mat-raised-button class="tienda" color="warn"
+                (click)="generatePDF('LA POLAR')">La Polar</button>
         </div>
-    </mat-card>
-    
+    </div>
 
-    <div class="modal-body" fxLayout="row" fxLayoutGap="20px">
-        <mat-card class="left-content">
+    <!-- Cuerpo del Modal -->
+    <div class="modal-body">
+        <div class="transport-info">
             <mat-list>
                 <mat-list-item>
                     <span class="mat-subheading-1">Sucursal:</span>
@@ -47,42 +46,36 @@
                     <span>{{ tim[0].nombreTim }}</span>
                 </mat-list-item>
             </mat-list>
-        </mat-card>
-
-        <mat-card class="right-content">
-            <!-- Tabla ficticia -->
+        </div>
+        <!-- Tabla de Resultados -->
+        <div class="table-section">
             <mat-card-content class="container">
                 <div class="button-container">
-                  <div class="dense-1">
-                    <mat-form-field appearance="outline">
-                      <mat-label>Busqueda rápida</mat-label>
-                      <input matInput placeholder="" #filterInput (keyup)="setFilter(filterInput.value)">
-                    </mat-form-field>
-                  </div>
-        
-                  <button mat-raised-button color="primary" (click)="onExportClick()">Excel</button>
-        
+                    <div class="dense-1">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Busqueda rápida</mat-label>
+                            <input matInput placeholder="" #filterInput (keyup)="setFilter(filterInput.value)">
+                        </mat-form-field>
+                    </div>
+
+                    <button mat-raised-button color="primary" (click)="onExportClick()">Excel</button>
+
                 </div>
-                <hr>
+           
                 <!--[rowData]="rowData$ | async""  es para indicar que es un observable-->
                 <!-- [rowSelection]="'multiple'" -->
-                <ag-grid-angular 
-                  style="width: 100%; height: calc(217px)" 
-                  class="ag-theme-alpine" 
-                  [columnDefs]="columnDefs"
-                  [defaultColDef]="defaultColDef" 
-                  [rowData]="rowData$" 
-                  [copyHeadersToClipboard]="true" 
-                  [animateRows]="true"
-                  [enableCellTextSelection]="true"
-                  [suppressCopyRowsToClipboard]="false"
-                  (gridReady)="onGridReady($event)"
-                  >
+                <ag-grid-angular style="width: 100%; height: calc(250px)" class="ag-theme-alpine"
+                    [columnDefs]="columnDefs" [defaultColDef]="defaultColDef" [rowData]="rowData$"
+                    [copyHeadersToClipboard]="true" [animateRows]="true" [enableCellTextSelection]="true"
+                    [suppressCopyRowsToClipboard]="false" (gridReady)="onGridReady($event)">
                 </ag-grid-angular>
-              </mat-card-content>
-        </mat-card>
+            </mat-card-content>
+        </div>
     </div>
+
+    <!-- Pie del Modal -->
     <div class="modal-footer">
-        <button mat-raised-button color="warn" (click)="onNoClick()">Cerrar</button>
+        <button closeBtn mat-raised-button color="warn" (click)="onNoClick()">Cerrar</button>
     </div>
+
 </div>

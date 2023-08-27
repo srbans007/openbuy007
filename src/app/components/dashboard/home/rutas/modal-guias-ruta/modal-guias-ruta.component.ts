@@ -466,7 +466,7 @@ export class ModalGuiasRutaComponent {
       style: 'bodyFont',
       table: {
         widths: [10, 50, 50, '*', 120, 85, 120, 70, 60, 60], // Ajusta estos valores según el contenido de tus columnas
-        body: bodyData
+        body: bodyData,
       },
       layout: {
         hLineWidth: function () {
@@ -488,16 +488,16 @@ export class ModalGuiasRutaComponent {
         body: [
           [{ text: 'Tienda ' + store.toUpperCase(), style: 'header2', colSpan: 3 }, {}, {}, { image: imageBase64, width: scaledWidth, height: scaledHeight, alignment: 'right' }],
           [
-            { text: 'Chofer: ' + this.chofer[0].nombres + ' ' + this.chofer[0].apellidos, style: 'bodyFont' },
-            { text: 'Cantidad x tienda: ' + lastGuideCountForStore, style: 'bodyFont' },
-            { text: 'Ruta: ' + this.nombreRuta[0].nombre_ruta, style: 'bodyFont' },
-            { text: 'Patente: ' + this.patente[0].patente, style: 'bodyFont' }
+            { text: 'Chofer: ' + this.chofer[0].nombres + ' ' + this.chofer[0].apellidos, style: 'header' },
+            { text: 'Cantidad x tienda: ' + lastGuideCountForStore, style: 'header' },
+            { text: 'Ruta: ' + this.nombreRuta[0].nombre_ruta, style: 'header' },
+            { text: 'Patente: ' + this.patente[0].patente, style: 'header' }
           ],
           [
-            { text: 'Ayudante: ' + this.ayudante[0].nombres + ' ' + this.ayudante[0].apellidos, style: 'bodyFont' },
-            { text: 'Total General: ' + numberOfTotalUniqueGuides, style: 'bodyFont' },
-            { text: 'Fecha: ' + '', style: 'bodyFont' },
-            { text: 'Tienda: ' + '', style: 'bodyFont' }
+            { text: 'Ayudante: ' + this.ayudante[0].nombres + ' ' + this.ayudante[0].apellidos, style: 'header' },
+            { text: 'Total General: ' + numberOfTotalUniqueGuides, style: 'header' },
+            { text: 'Fecha: ' + '', style: 'header' },
+            { text: 'Tienda: ' + '', style: 'header' }
           ]
         ]
       },
@@ -512,8 +512,8 @@ export class ModalGuiasRutaComponent {
       ],
       styles: {
         header: {
-          fontSize: 16,
-          bold: true
+          fontSize: 9,
+          bold: false
         },
         bodyFont: {
           fontSize: 8,
@@ -522,7 +522,7 @@ export class ModalGuiasRutaComponent {
       },
       pageSize: { width: 595.28, height: 841.89 }, // Tamaño A4
       pageOrientation: 'landscape' as const,
-      pageMargins: [28.3, 28.3, 28.3, 28.3] // Margen de 1cm en cada lado
+      pageMargins: [28.3, 15, 28.3, 28.3] // Margen de 1cm en cada lado
     };
 
     // Genera y descarga el PDF

@@ -23,6 +23,11 @@
             "polyfills": [
               "zone.js"
             ],
+            "allowedCommonJsDependencies": [
+              "moment",
+              "moment-timezone",
+              "pdfmake"
+            ],
 
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",

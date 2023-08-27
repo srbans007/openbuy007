@@ -1,98 +1,59 @@
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 700px;
-  height: 570px;
-  display: grid;
-  grid-template-rows: auto 1fr auto; // Divide el modal en cabecera, cuerpo y pie
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
-
-.modal-header,
-.modal-footer {
-  padding: 16px;
-  border-bottom: 1px solid #e0e0e0; // Agrega un borde al pie de cabecera para separarlo visualmente
-}
-
-.modal-footer {
-  border-top: 1px solid #e0e0e0; // Agrega un borde al pie de cabecera para separarlo visualmente
+.modalO {
+  width: 650px; // Ajusta el ancho para que sea un poco más pequeño en dispositivos más estrechos
+  height: 535px; // Permite que el modal se ajuste en función del contenido
 }
 
 .modal-body {
-  display: flex; // Cambiamos a flexbox para un mejor control
-  justify-content: space-between; // Separa los contenidos a los extremos
-  align-items: flex-start; // Alinea los contenidos al inicio (parte superior)
-  padding: 16px;
-  gap: 16px;
+  display: flex;
+  flex-direction: row; // Cambia la dirección principal a fila
+  justify-content: center; // Centra horizontalmente
+  align-items: center; // Centra verticalmente
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column; // Cambia la dirección principal a fila
+  justify-content: center; // Centra horizontalmente
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 15px;
+  padding: 15px;
+}
+
+.shop-buttons {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: 15px;
+}
+
+.transport-info,
+.table-section {
+  flex: 1; // Ambos ocupan la misma proporción del espacio
   overflow-y: auto;
 }
 
-.mat-card { // Agregamos estilos para las tarjetas (mat-card) para que se vean bien en el modal
-  flex: 1; // Ocupa todo el espacio disponible
-  overflow-y: auto; // Permite el desplazamiento si el contenido es demasiado largo
-  box-shadow: none; // Remueve la sombra ya que estamos en un modal con su propia sombra
-}
 
-.left-content {
-  padding: 16px;
-  border: 1px solid #e0e0e0;
-}
-
-.inputGuia {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.centered-content {
-  display: flex;
-  justify-content: center;
-  width: 100%;
+.modal-footer{
+  margin-right: 15px;
 }
 
 @media (max-width: 768px) {
-  .modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 80%;
-    display: flex; // Cambia a flexbox
-    flex-direction: column; // Dirección principal es columna
-    align-items: center; // Centra los elementos horizontalmente
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
-
-  .modal {
+  .modalO {
     width: 100%; // Ajusta el ancho para que sea un poco más pequeño en dispositivos más estrechos
-    height: 80%; // Permite que el modal se ajuste en función del contenido
+    height: 535px; // Permite que el modal se ajuste en función del contenido
   }
 
   .modal-body {
-    flex-direction: column !important; // Cambia la dirección a vertical
-  }
-
-  .modal-body .mat-card .left-content{
-    width: 100% !important; // Establece el ancho al 100% para las tarjetas
-    box-sizing: border-box !important; // Asegura que padding y border se incluyan en el ancho total
-    overflow-x: auto !important; // Permite el desplazamiento horizontal si es necesario
-  }
-
-  // Estilo adicional para manejar el desbordamiento de la tabla
-  table.mat-table {
-    min-width: 100% !important; // La tabla debe ocupar al menos el 100% del ancho del contenedor
-    display: block !important; // Cambia la tabla a bloque para permitir el desplazamiento
-    overflow-x: auto !important; // Permite el desplazamiento horizontal si es necesario
+    display: flex;
+    flex-direction: column; // Cambia la dirección principal a fila
+    justify-content: center; // Centra horizontalmente
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 15px;
+    padding: 15px;
   }
 
 }
