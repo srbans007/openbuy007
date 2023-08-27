@@ -10,6 +10,7 @@ import { Sucursal } from 'src/app/interfaces/sucursal';
 import { Router } from '@angular/router';
 import { GuiasProcesadasService } from 'src/app/services/guias-procesadas.service';
 import { GuiaProcesada } from 'src/app/interfaces/guiaProcesada';
+import { Observable, forkJoin, map } from 'rxjs';
 
 @Component({
   selector: 'app-carga-datos',
@@ -220,9 +221,39 @@ export class CargaDatosComponent {
   }
 
 
+  verifyAllGuiasExistInDB(): Observable<{ allExist: boolean, missingGuides: number[] }> {
+    const guiasFromExcel = this.fileDataDiarias.map((guia: { boleta: any; }) => guia.boleta);
+    const guiQueries = guiasFromExcel.map((boleta: string) => this._GuiasProcesadasService.getBuscarGuia(boleta));
+  
+    return (forkJoin(guiQueries) as Observable<GuiaProcesada[][]>).pipe(
+      map(responses => {
+        let missingGuides: number[] = [];
+        for (let i = 0; i < responses.length; i++) {
+          const response = responses[i];
+          if (!response || response.length === 0) {
+            missingGuides.push(guiasFromExcel[i]);
+          }
+        }
+        return { allExist: missingGuides.length === 0, missingGuides };
+      })
+    );
+  }
+
 
   onUploadDiarias() {
+    this.verifyAllGuiasExistInDB().subscribe(result => {
+      if (!result.allExist) {
+        const missingGuidesString = result.missingGuides.join(', ');
+        this._snackBar.open(`Las siguientes guías no existen, o no estan asignadas: ${missingGuidesString}`, '', {
+          duration: 5000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        return;  // Si alguna guía no existe, terminamos aquí.
+      }
+
     if (this.fileDataDiarias && this.fileDataDiarias.length > 0) {
+      
       let processedCount = 0;
   
       const updateGuia = (guiaToUpdate: any) => {
@@ -329,6 +360,7 @@ export class CargaDatosComponent {
         verticalPosition: 'top'
       });
     }
-  }
+  });
+}
   
 }
