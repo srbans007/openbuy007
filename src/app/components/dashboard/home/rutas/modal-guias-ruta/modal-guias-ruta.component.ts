@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ICellRendererParams, CellClickedEvent, ColDef, ColumnApi, GridApi } from 'ag-grid-community';
-import { Observable, concatMap, lastValueFrom } from 'rxjs';
+import { EMPTY, Observable, Subject, concatMap, lastValueFrom } from 'rxjs';
 import { GuiaRuta } from 'src/app/interfaces/guiaRuta';
 import { Ruta } from 'src/app/interfaces/ruta';
 import { Seguimiento } from 'src/app/interfaces/seguimiento';
@@ -36,6 +36,7 @@ import { HttpClient } from '@angular/common/http';
 
 export class ModalGuiasRutaComponent {
   // Propiedades
+  currentStore: string = '';
   guiaInputValue: string = '';
   sucursalControl = new FormControl();
   choferControl = new FormControl();
@@ -59,7 +60,8 @@ export class ModalGuiasRutaComponent {
   patente: Vehiculo[] = [];
   nombreRuta: TipoRuta[] = [];
   tim: Tim[] = [];
-
+  
+  private addClickNotifier = new Subject<boolean>();
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
   public rowData$!: GuiaRuta[];
@@ -225,10 +227,14 @@ export class ModalGuiasRutaComponent {
           // Insertar cada registro de resultArray
 
           this.newGuiaRuta = resultArray;
-          this.onAddClick();
-          console.log('guiaqlia', this.guiaInputValue)
 
-          this.guiaInputValue = '';
+          this.onAddClick();
+          // Escuchar el resultado del onAddClick
+          this.addClickNotifier.subscribe(success => {
+            if (success) {
+              this.guiaInputValue = '';
+            }
+          });
         },
         error: (err) => {
           console.error('Error al buscar guía:', err);
@@ -244,6 +250,15 @@ export class ModalGuiasRutaComponent {
 
     this._GuiaRutaService.insertGuiaRuta(this.newGuiaRuta).pipe(
       concatMap((guiaRutas) => {
+        // Verificar si guiaRutas está vacío
+        if (!guiaRutas || guiaRutas.length === 0) {
+          this._snackBar.open('Guia ya asignada', '', {
+            duration: 2000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+          return EMPTY;  // Termina la secuencia
+        }
         console.log('Guias agregadas:', guiaRutas);
         this._snackBar.open('Guias Agregadas', '', {
           duration: 2000,
@@ -270,9 +285,11 @@ export class ModalGuiasRutaComponent {
         if (this.inputGuia && this.inputGuia.nativeElement) {
           this.inputGuia.nativeElement.focus();
         }
+        this.addClickNotifier.next(true);  // Notifica que se ejecutó correctamente
       },
       error: (error) => {
         console.error('Ocurrió un error:', error);
+        this.addClickNotifier.next(false); // Notifica que hubo un error
       },
       complete: () => {
         console.log('Operación de inserción completa.');
@@ -300,6 +317,7 @@ export class ModalGuiasRutaComponent {
             duration: 2000,
             horizontalPosition: 'center',
             verticalPosition: 'top'
+            
           });
 
           // Accede a id_guia e id_ruta desde el objeto data
@@ -329,6 +347,12 @@ export class ModalGuiasRutaComponent {
 
         },
         error: (error) => {
+          this._snackBar.open('Guia Procesada, no se puede eliminar', '', {
+            duration: 2000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+            
+          });
           console.error('Ocurrió un error al eliminar:', error);
         }
       });
@@ -401,8 +425,6 @@ export class ModalGuiasRutaComponent {
     };
   }
 
-  //manejo de tiendas
-  currentStore: string = '';
   transformRowForPDF(row: any): any[] {
     const createdAtInSantiago = moment(row.createdAt).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
 
@@ -528,7 +550,6 @@ export class ModalGuiasRutaComponent {
     // Genera y descarga el PDF
     pdfMake.createPdf(docDefinition as any).download(`timConductor_${store}.pdf`);
   }
-
 
   async getImageAsBase64(): Promise<string> {
     const imagePath = '../../../../../../assets/img/openbuy.png';

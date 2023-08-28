@@ -1,9 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ColDef, ColumnApi } from 'ag-grid-community';
-import { AgGridService } from 'src/app/services/ag-grid.service'; // Asegúrate de que la ruta es correcta
-import { TiendaService } from 'src/app/services/tienda.service';
-import { SucursalService } from 'src/app/services/sucursal.service';
+import { AgGridService } from 'src/app/services/ag-grid.service';
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi } from 'ag-grid-community';
 import * as XLSX from 'xlsx';
@@ -18,7 +16,7 @@ import { TodoCargaService } from 'src/app/services/todo-carga.service';
   styleUrls: ['./seguimiento.component.scss']
 })
 export class SeguimientoComponent {
-  //private gridApi!: AgGridModule;
+
   private gridColumnApi!: ColumnApi;
   private gridApi!: GridApi;
 
@@ -32,6 +30,14 @@ export class SeguimientoComponent {
     { field: 'ruta.id_ayudante', hide: true },
 
     // Mostrar datos relevantes
+    {
+      field: 'createdAt',
+      headerName: 'Fecha Ruta',
+      valueFormatter: (params: { value: moment.MomentInput; }) => {
+        const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY');
+        return dateInSantiago;
+      }
+    },
     { field: 'guia.tienda.nombre_tienda', headerName: 'Tienda' },
     { field: 'guia.guia', headerName: 'Guia' },
     { field: 'guia.boleta', headerName: 'Boleta' },
@@ -55,7 +61,6 @@ export class SeguimientoComponent {
         return '';  // Retorna una cadena vacía si no hay datos de ayudante o si no es de tipo 'Ayudante'
       }
     },
-    { field: 'guia.marcaPgd', headerName: 'Estado' },
     {
       field: 'createdAt',
       headerName: 'Fecha Creación',
