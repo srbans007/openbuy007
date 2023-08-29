@@ -194,20 +194,21 @@ export class CargaDatosComponent {
 
   onFileSelectedDiarias(event: any) {
     const target: DataTransfer = <DataTransfer>(event.target);
-
+  
     if (target.files && target.files.length > 0) {
       this.fileName = target.files[0].name;
       const reader: FileReader = new FileReader();
-
+  
       reader.onload = (e: any) => {
         const bstr: string = e.target.result;
         const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
         const wsname: string = wb.SheetNames[0];
         const ws: XLSX.WorkSheet = wb.Sheets[wsname];
         this.fileDataDiarias = XLSX.utils.sheet_to_json(ws);
-
+  
         this.fileDataDiarias.forEach((guiaNueva: any) => {
-          this._GuiasProcesadasService.getBuscarGuiaRuta(guiaNueva.id_guiaRuta).subscribe(guiasEncontradas => {
+          const encodedIdGuiaRuta = encodeURIComponent(guiaNueva.id_guiaRuta);
+          this._GuiasProcesadasService.getBuscarGuiaRuta(encodedIdGuiaRuta).subscribe(guiasEncontradas => {
             if (guiasEncontradas.length > 0) {
               this.idGuiaRutaToIdMap[guiaNueva.id_guiaRuta] = this.idGuiaRutaToIdMap[guiaNueva.id_guiaRuta] || [];
               this.idGuiaRutaToIdMap[guiaNueva.id_guiaRuta].push(...guiasEncontradas.map(guia => guia.id as number));
@@ -215,16 +216,19 @@ export class CargaDatosComponent {
           });
         });
       };
-
+  
       reader.readAsBinaryString(target.files[0]);
     }
   }
+  
 
 
   verifyAllGuiasExistInDB(): Observable<{ allExist: boolean, missingGuides: number[] }> {
     const guiasFromExcel = this.fileDataDiarias.map((guia: { boleta: any; }) => guia.boleta);
-    const guiQueries = guiasFromExcel.map((boleta: string) => this._GuiasProcesadasService.getBuscarGuia(boleta));
-  
+    const guiQueries = guiasFromExcel.map((boleta: string) => {
+      const encodedBoleta = encodeURIComponent(boleta);
+      return this._GuiasProcesadasService.getBuscarGuia(encodedBoleta);
+    });
     return (forkJoin(guiQueries) as Observable<GuiaProcesada[][]>).pipe(
       map(responses => {
         let missingGuides: number[] = [];
@@ -237,7 +241,7 @@ export class CargaDatosComponent {
         return { allExist: missingGuides.length === 0, missingGuides };
       })
     );
-  }
+  }  
 
 
   onUploadDiarias() {
@@ -329,7 +333,8 @@ export class CargaDatosComponent {
       };
   
       this.fileDataDiarias.forEach((guiaNueva: any) => {
-        this._GuiasProcesadasService.getBuscarGuia(guiaNueva.boleta).subscribe({
+        const encodedGuia = encodeURIComponent(guiaNueva.boleta);
+        this._GuiasProcesadasService.getBuscarGuia(encodedGuia).subscribe({
           next: guiasEncontradas => {
             if (guiasEncontradas && guiasEncontradas.length > 0) {
               console.log('guiasqls',guiasEncontradas)

@@ -132,6 +132,7 @@ export class SeguimientoComponent {
     this.gridApi.forEachNodeAfterFilterAndSort((node) => {
       const data = node.data;
       const row = {
+        'Fecha Ruta': moment(data.createdAt).tz("America/Santiago").format('DD-MM-YYYY'),
         'Tienda': data.guia.tienda.nombre_tienda,
         'Guia': data.guia.guia,
         'Boleta': data.guia.boleta,
@@ -141,7 +142,6 @@ export class SeguimientoComponent {
           `${data.ruta.chofer.nombres || ''} ${data.ruta.chofer.apellidos || ''}` : '',
         'Ayudante': data.ruta && data.ruta.ayudante && data.ruta.ayudante.tipoTransporte.transporte === 'Ayudante' ?
           `${data.ruta.ayudante.nombres || ''} ${data.ruta.ayudante.apellidos || ''}` : '',
-        'Estado': data.guia.marcaPgd,
         'Fecha Creación': moment(data.createdAt).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss')
       };
       processedRows.push(row);

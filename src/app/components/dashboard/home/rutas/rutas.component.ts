@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams, Column } from 'ag-grid-community';
+import { ColDef, ColumnApi, CellClickedEvent, ICellRendererParams } from 'ag-grid-community';
 import { AgGridService } from 'src/app/services/ag-grid.service'; 
 import { Sucursal } from 'src/app/interfaces/sucursal';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -49,65 +49,6 @@ export class RutasComponent {
   columnDefs: ColDef[] = [
     { field: 'id', hide: true },
     {
-      field: 'id_sucursal',
-      headerName: 'Sucursal',
-      valueGetter: (params: { data: { id_sucursal: number; }; }) => {
-        const sucursal = this.sucursales.find(s => s.id === params.data.id_sucursal);
-        return sucursal ? sucursal.nombre_sucursal : '';
-      }
-    },
-    {
-      field: 'id_chofer',
-      headerName: 'Chofer',
-      valueGetter: (params: { data: { id_chofer: number; }; }) => {
-        const chofer = this.chofer.find(c => c.id === params.data.id_chofer);
-        return chofer ? chofer.nombres + ' ' + chofer.apellidos : '';
-      }
-    },
-    {
-      field: 'id_ayudante',
-      headerName: 'Ayudante',
-      valueGetter: (params: { data: { id_ayudante: number; }; }) => {
-        const ayudante = this.ayudante.find(a => a.id === params.data.id_ayudante);
-        return ayudante ? ayudante.nombres + ' ' + ayudante.apellidos : '';
-      }
-    },
-    {
-      field: 'id_vehiculo',
-      headerName: 'Patente',
-      valueGetter: (params: { data: { id_vehiculo: number; }; }) => {
-        const patenteVeh = this.patente.find(v => v.id === params.data.id_vehiculo);
-        return patenteVeh ? patenteVeh.patente : '';
-      }
-    },
-    {
-      field: 'id_tipoRuta',
-      headerName: 'Tipo Ruta',
-      valueGetter: (params: { data: { id_tipoRuta: number; }; }) => {
-        const tpRuta = this.tipoRuta.find(tR => tR.id === params.data.id_tipoRuta);
-        return tpRuta ? tpRuta.nombre_ruta : '';
-      }
-    },
-    {
-      field: 'id_tim',
-      headerName: 'Tipo Tim',
-      valueGetter: (params: { data: { id_tim: number; }; }) => {
-        const tpTim = this.tim.find(tM => tM.id === params.data.id_tim);
-        return tpTim ? tpTim.nombreTim : '';
-      }
-    },
-    { 
-      field: 'createdAt', 
-      headerName: 'Fecha Creación',
-      sortable: true,
-      sort: 'desc',
-      valueFormatter: (params: { value: moment.MomentInput; }) => {
-          const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
-          return dateInSantiago;
-      }
-    },
-
-    {
       headerName: "Acciones",
       field: "actions",
       cellRenderer: (params: ICellRendererParams) => `
@@ -136,6 +77,70 @@ export class RutasComponent {
       },
       width: 190
 
+    },
+    { 
+      field: 'createdAt', 
+      headerName: 'Fecha Creación',
+      sortable: true,
+      sort: 'desc',
+      valueFormatter: (params: { value: moment.MomentInput; }) => {
+          const dateInSantiago = moment(params.value).tz("America/Santiago").format('DD-MM-YYYY HH:mm:ss');
+          return dateInSantiago;
+      },
+      width: 190
+      
+    },
+    {
+      field: 'id_sucursal',
+      headerName: 'Sucursal',
+      valueGetter: (params: { data: { id_sucursal: number; }; }) => {
+        const sucursal = this.sucursales.find(s => s.id === params.data.id_sucursal);
+        return sucursal ? sucursal.nombre_sucursal : '';
+      },
+      width: 110
+    },
+    {
+      field: 'id_chofer',
+      headerName: 'Chofer',
+      valueGetter: (params: { data: { id_chofer: number; }; }) => {
+        const chofer = this.chofer.find(c => c.id === params.data.id_chofer);
+        return chofer ? chofer.nombres + ' ' + chofer.apellidos : '';
+      }
+    },
+    {
+      field: 'id_ayudante',
+      headerName: 'Ayudante',
+      valueGetter: (params: { data: { id_ayudante: number; }; }) => {
+        const ayudante = this.ayudante.find(a => a.id === params.data.id_ayudante);
+        return ayudante ? ayudante.nombres + ' ' + ayudante.apellidos : '';
+      }
+    },
+    {
+      field: 'id_vehiculo',
+      headerName: 'Patente',
+      valueGetter: (params: { data: { id_vehiculo: number; }; }) => {
+        const patenteVeh = this.patente.find(v => v.id === params.data.id_vehiculo);
+        return patenteVeh ? patenteVeh.patente : '';
+      },
+      width: 110
+    },
+    {
+      field: 'id_tipoRuta',
+      headerName: 'Tipo Ruta',
+      valueGetter: (params: { data: { id_tipoRuta: number; }; }) => {
+        const tpRuta = this.tipoRuta.find(tR => tR.id === params.data.id_tipoRuta);
+        return tpRuta ? tpRuta.nombre_ruta : '';
+      },
+      width: 120
+    },
+    {
+      field: 'id_tim',
+      headerName: 'Tipo Tim',
+      valueGetter: (params: { data: { id_tim: number; }; }) => {
+        const tpTim = this.tim.find(tM => tM.id === params.data.id_tim);
+        return tpTim ? tpTim.nombreTim : '';
+      },
+      width: 110
     }
 
   ];

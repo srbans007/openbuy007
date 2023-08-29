@@ -72,8 +72,8 @@ export class ModalRutasComponent {
       tim: this._TipoTimService.getTim()
     }).subscribe(res => {
       this.sucursal = res.sucursal;
-      this.chofer = res.transportista;
-      this.ayudante = res.transportista;
+      this.chofer = res.transportista.filter(t => t.tipoTransporte && t.tipoTransporte.transporte === 'Chofer');
+      this.ayudante = res.transportista.filter(t => t.tipoTransporte && t.tipoTransporte.transporte === 'Ayudante');
       this.patente = res.vehiculo;
       this.nombreRuta = res.tipoRuta;
       this.tim = res.tim;

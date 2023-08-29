@@ -3,5 +3,9 @@ export interface Transportista {
     id_sucursal?: number,
     id_transporte?: number,
     nombres: string,
-    apellidos: string
+    apellidos: string,
+    tipoTransporte?: {
+        id: number,
+        transporte: string
+    }
 }
